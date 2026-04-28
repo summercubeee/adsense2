@@ -2,145 +2,81 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>애드센스 RPG - 틈새의 정복자</title>
+    <title>애드센스 마스터: 본질의 추구</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap');
-        body { background: #111; color: #fff; font-family: 'DungGeunMo', sans-serif; margin: 0; overflow: hidden; }
+        body { background: #000; color: #fff; font-family: 'DungGeunMo', sans-serif; margin: 0; }
+        #ui { position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 15px; border-bottom: 2px solid #2ecc71; display: flex; justify-content: space-around; z-index: 100; }
+        #game-map { width: 100vw; height: 100vh; background: #1a1a1a; position: relative; overflow: hidden; }
         
-        /* 게임 맵 (도트 감성 배경) */
-        #game-world { 
-            width: 100vw; height: 100vh; 
-            background-image: url('https://raw.githubusercontent.com/KenneyNL/Adobe-Animate-Extension/master/Example%20Assets/Backgrounds/background_0.png');
-            background-size: 800px; image-rendering: pixelated;
-            position: relative; 
-        }
-
-        /* 캐릭터 (하종수 마케터) */
-        #player {
-            width: 64px; height: 64px;
-            background: url('https://kenney.nl/content/assets/pixel-platformer/Preview.png') -20px -20px;
-            background-size: 600px; image-rendering: pixelated;
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            transition: 0.1s; z-index: 10;
-        }
-
-        /* 몬스터 (키워드 몬스터) */
-        .monster {
-            width: 48px; height: 48px; position: absolute;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold; text-align: center;
-            border-radius: 5px; box-shadow: 0 0 10px rgba(255,255,255,0.3);
-            cursor: pointer;
-        }
-
-        /* 상단 UI 스테이터스 */
-        #ui-bar {
-            position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.8);
-            padding: 15px; border-bottom: 3px solid #ffd700;
-            display: flex; justify-content: space-around; z-index: 100;
-        }
-
-        .stat-item { color: #ffd700; font-size: 18px; }
-        .energy-bar { width: 150px; height: 15px; background: #333; border: 2px solid #fff; }
-        #energy-fill { width: 100%; height: 100%; background: #2ecc71; transition: 0.3s; }
-
-        /* 알림 메시지 */
-        #msg-box {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); padding: 10px 30px; border: 2px solid #fff;
-            color: #2ecc71; font-size: 16px; display: none;
-        }
+        /* 캐릭터 (마케터) */
+        #player { width: 40px; height: 40px; background: #f1c40f; position: absolute; border: 2px solid #fff; transition: 0.1s; }
+        
+        /* 키워드 몬스터 */
+        .keyword { position: absolute; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .is-real { border: 2px solid #ffd700; color: #ffd700; } /* 될 만한 놈 */
+        .is-fake { border: 2px solid #555; color: #555; } /* 안 될 놈 */
     </style>
 </head>
 <body>
 
-<div id="ui-bar">
-    <div class="stat-item">💰 수익: $<span id="income">0</span></div>
-    <div class="stat-item">🧠 분석력: Lv.<span id="level">1</span></div>
-    <div class="stat-item">⚡ 에너지: <div class="energy-bar"><div id="energy-fill"></div></div></div>
+<div id="ui">
+    <div>💰 수익: $<span id="money">0</span></div>
+    <div>🧠 분석력: Lv.<span id="level">1</span></div>
+    <div>🔥 트래픽: <span id="traffic">0</span></div>
 </div>
 
-<div id="game-world">
-    <div id="player"></div>
+<div id="game-map">
+    <div id="player" style="left: 50%; top: 50%;"></div>
 </div>
-
-<div id="msg-box"></div>
 
 <script>
-    let player = { x: window.innerWidth/2, y: window.innerHeight/2, income: 0, level: 1, hp: 100 };
-    const gameWorld = document.getElementById('game-world');
+    let stats = { money: 0, level: 1, traffic: 0, hp: 100 };
+    const map = document.getElementById('game-map');
+    const player = document.getElementById('player');
 
-    // 몬스터 종류 (영상 컨셉)
-    const monsterTypes = [
-        { name: "틈새:전쟁지원금", color: "#3498db", value: 10, reqLv: 1, hp: 20 },
-        { name: "틈새:이재명지원금", color: "#3498db", value: 15, reqLv: 2, hp: 30 },
-        { name: "메인:고유가지원금", color: "#e74c3c", value: 150, reqLv: 10, hp: 200 }
-    ];
-
-    // 몬스터 생성
-    function spawnMonster() {
-        const type = monsterTypes[Math.random() < 0.8 ? 0 : (Math.random() < 0.9 ? 1 : 2)];
-        const m = document.createElement('div');
-        m.className = 'monster';
-        m.style.backgroundColor = type.color;
-        m.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-        m.style.top = Math.random() * (window.innerHeight - 100) + 100 + 'px';
-        m.innerHTML = type.name;
+    // 키워드 생성 (영상 4: '될 만한 놈' 찾기 로직)
+    function spawnKeyword() {
+        const kw = document.createElement('div');
+        const isReal = Math.random() > 0.6; // 40% 확률로 진짜 수익 키워드
+        kw.className = `keyword ${isReal ? 'is-real' : 'is-fake'}`;
+        kw.innerText = isReal ? "💎 될 만한 놈" : "❌ 안 될 놈";
+        kw.style.left = Math.random() * 90 + 'vw';
+        kw.style.top = Math.random() * 80 + 10 + 'vh';
         
-        m.onclick = () => fight(type, m);
-        gameWorld.appendChild(m);
-    }
-
-    // 전투 로직 (포스팅 과정)
-    function fight(type, element) {
-        if (player.hp <= 0) {
-            showMsg("지쳐서 글을 쓸 수 없습니다! (F5로 빵집 방문)");
-            return;
-        }
-
-        if (player.level < type.reqLv) {
-            showMsg(`분석력이 낮아 '${type.name}' 글을 써도 노출되지 않습니다!`);
-            player.hp -= 10;
-        } else {
-            player.income += type.value;
-            player.level += 0.5;
-            player.hp -= 5;
-            showMsg(`'${type.name}' 포스팅 성공! $${type.value} 수익 발생!`);
-            element.remove();
-            spawnMonster();
-        }
-        updateUI();
-    }
-
-    function showMsg(txt) {
-        const box = document.getElementById('msg-box');
-        box.innerText = txt;
-        box.style.display = 'block';
-        setTimeout(() => box.style.display = 'none', 2000);
+        kw.onclick = () => {
+            if(isReal) {
+                stats.traffic += 100;
+                stats.money += (stats.traffic * 0.5); // 본질 공식: 트래픽 x 단가
+                stats.level += 1;
+                alert("본질 파악 성공! 외부 유입과 광고 배치가 적중했습니다.");
+            } else {
+                alert("안 되는 것에 에너지를 썼습니다. 수익 0원.");
+            }
+            kw.remove();
+            updateUI();
+            spawnKeyword();
+        };
+        map.appendChild(kw);
     }
 
     function updateUI() {
-        document.getElementById('income').innerText = Math.floor(player.income);
-        document.getElementById('level').innerText = Math.floor(player.level);
-        document.getElementById('energy-fill').style.width = player.hp + "%";
+        document.getElementById('money').innerText = Math.floor(stats.money);
+        document.getElementById('level').innerText = stats.level;
+        document.getElementById('traffic').innerText = stats.traffic;
     }
 
-    // 초기 몬스터 소환
-    for(let i=0; i<5; i++) spawnMonster();
-
-    // 키보드 조작 (간단히 위치 이동)
+    // 캐릭터 이동
     window.addEventListener('keydown', (e) => {
-        const speed = 20;
-        if(e.key === 'ArrowUp') player.y -= speed;
-        if(e.key === 'ArrowDown') player.y += speed;
-        if(e.key === 'ArrowLeft') player.x -= speed;
-        if(e.key === 'ArrowRight') player.x += speed;
-        
-        const p = document.getElementById('player');
-        p.style.left = player.x + 'px';
-        p.style.top = player.y + 'px';
+        let l = parseInt(player.style.left);
+        let t = parseInt(player.style.top);
+        if(e.key === 'ArrowUp') player.style.top = (t-5) + '%';
+        if(e.key === 'ArrowDown') player.style.top = (t+5) + '%';
+        if(e.key === 'ArrowLeft') player.style.left = (l-5) + '%';
+        if(e.key === 'ArrowRight') player.style.left = (l+5) + '%';
     });
 
+    for(let i=0; i<5; i++) spawnKeyword();
 </script>
 </body>
 </html>
