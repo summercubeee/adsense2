@@ -2,106 +2,131 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>애드센스 던전: 틈새의 지배자</title>
+    <title>애드센스 던전: 도트 메이커</title>
     <style>
-        body { background: #1a1a1a; color: #fff; text-align: center; font-family: sans-serif; }
-        canvas { border: 4px solid #444; background: #000; cursor: crosshair; }
-        .ui { margin-top: 20px; }
-        .info { color: #aaa; font-size: 0.9em; margin-top: 10px; }
+        /* 도트 감성을 위한 폰트 및 스타일 */
+        body { background: #2c3e50; color: #fff; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #game-window { background: #000; width: 600px; border: 6px solid #ecf0f1; border-radius: 8px; position: relative; overflow: hidden; }
+        
+        /* 배경 설정 (OpenGameArt의 도트 배경 이미지 활용) */
+        #stage { 
+            height: 300px; 
+            background-image: url('https://raw.githubusercontent.com/KenneyNL/Adobe-Animate-Extension/master/Example%20Assets/Backgrounds/background_0.png');
+            background-size: cover;
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px;
+        }
+
+        /* 도트 캐릭터 (Kenney의 픽셀 캐릭터) */
+        #character { 
+            width: 96px; height: 96px; 
+            background-image: url('https://kenney.nl/content/assets/pixel-platformer/Preview.png'); /* 임시 스프라이트 시트 */
+            background-size: 800px;
+            background-position: -20px -20px; /* 특정 캐릭터 위치 추출 */
+            image-rendering: pixelated;
+        }
+
+        .stat-panel { display: grid; grid-template-columns: 1fr 1fr; background: #34495e; padding: 10px; border-top: 4px solid #ecf0f1; }
+        .log-panel { height: 100px; background: #000; padding: 10px; overflow-y: auto; font-size: 13px; color: #2ecc71; border-top: 2px solid #7f8c8d; text-align: left; }
+        
+        .action-panel { display: flex; flex-wrap: wrap; justify-content: center; background: #2c3e50; padding: 10px; }
+        button { 
+            background: #e67e22; border: none; border-bottom: 4px solid #d35400; color: white; 
+            padding: 10px 15px; margin: 5px; cursor: pointer; font-family: inherit; font-weight: bold;
+        }
+        button:active { border-bottom: none; transform: translateY(4px); }
+        button:disabled { background: #7f8c8d; border-bottom: 4px solid #2c3e50; }
     </style>
 </head>
 <body>
-    <h1>애드센스 던전: 틈새의 지배자</h1>
-    <div class="ui">
-        <span>현재 수익: $<span id="score">0</span></span> | 
-        <span>남은 에너지: <span id="energy">100</span>%</span>
-    </div>
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-    <div class="info">
-        * 조작: 마우스 클릭으로 키워드 수집<br>
-        * <b>황금색(메인 키워드)</b>: 클릭 시 큰 수익을 주지만 1초 만에 사라집니다.<br>
-        * <b>푸른색(틈새 키워드)</b>: 수익은 작지만 화면에 오래 머물며 꾸준히 생성됩니다.
+
+<div id="game-window">
+    <div id="stage">
+        <div id="character" title="블로거 하종수"></div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const energyEl = document.getElementById('energy');
+    <div class="stat-panel">
+        <div>💰 수익: $<span id="money">0</span></div>
+        <div>💪 체력: <span id="hp">100</span></div>
+        <div>🧠 분석: <span id="analysis">0</span></div>
+        <div>✨ 자신감: <span id="conf">0</span></div>
+    </div>
 
-        let score = 0;
-        let energy = 100;
-        let keywords = [];
+    <div class="log-panel" id="log">
+        [시스템] "큰 키워드만 고집할 필요는 없습니다."<br>틈새 키워드로 전설의 블로거가 되세요!
+    </div>
 
-        class Keyword {
-            constructor(type) {
-                this.type = type; // 'main' or 'niche'
-                this.x = Math.random() * (canvas.width - 100) + 50;
-                this.y = Math.random() * (canvas.height - 100) + 50;
-                this.life = type === 'main' ? 60 : 300; // 메인은 1초(60프레임), 틈새는 5초
-                this.opacity = 1;
-                this.text = type === 'main' ? "💰 메인 키워드" : "💎 틈새 키워드";
-                this.color = type === 'main' ? "#FFD700" : "#00BFFF";
-                this.value = type === 'main' ? 50 : 10;
-            }
+    <div class="action-panel">
+        <button onclick="play('study')">VOD 공부</button>
+        <button onclick="play('niche')">틈새 키워드</button>
+        <button onclick="play('main')">메인 키워드</button>
+        <button onclick="play('rest')">빵집 휴식</button>
+    </div>
+</div>
 
-            draw() {
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
-                ctx.font = "bold 16px sans-serif";
-                ctx.fillText(this.text, this.x, this.y);
-                ctx.globalAlpha = 1;
-            }
+<script>
+    let stats = { money: 0, hp: 100, analysis: 0, conf: 0 };
 
-            update() {
-                this.life--;
-                if (this.life < 20) this.opacity -= 0.05;
-            }
+    function log(msg) {
+        const logBox = document.getElementById('log');
+        logBox.innerHTML += `<div>> ${msg}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function update() {
+        document.getElementById('money').innerText = stats.money;
+        document.getElementById('hp').innerText = stats.hp;
+        document.getElementById('analysis').innerText = stats.analysis;
+        document.getElementById('conf').innerText = stats.conf;
+        
+        // 체력에 따른 캐릭터 상태 표현 (도트 위치 변경)
+        const char = document.getElementById('character');
+        if (stats.hp < 30) char.style.filter = "grayscale(100%)";
+        else char.style.filter = "none";
+    }
+
+    function play(type) {
+        if (stats.hp <= 0 && type !== 'rest') {
+            log("너무 지쳤습니다. 휴식이 필요합니다!");
+            return;
         }
 
-        function spawn() {
-            if (Math.random() < 0.02) keywords.push(new Keyword('main'));
-            if (Math.random() < 0.05) keywords.push(new Keyword('niche'));
-        }
-
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            keywords.forEach((kw, index) => {
-                if (mouseX > kw.x - 20 && mouseX < kw.x + 100 &&
-                    mouseY > kw.y - 20 && mouseY < kw.y + 10) {
-                    score += kw.value;
-                    energy -= 2; // 글 하나 쓸 때마다 에너지 소모
-                    keywords.splice(index, 1);
-                    scoreEl.innerText = score;
-                    energyEl.innerText = energy;
+        switch(type) {
+            case 'study':
+                stats.analysis += 12;
+                stats.hp -= 10;
+                log("본질센스 강의 시청! '잠재 트래픽'의 개념을 깨달았습니다.");
+                break;
+            case 'niche':
+                let reward = 15 + Math.floor(stats.analysis / 3);
+                stats.money += reward;
+                stats.conf += 5;
+                stats.hp -= 15;
+                log(`틈새 키워드 '${['전쟁 지원금', '이재명 지원금', '실버 정보'][Math.floor(Math.random()*3)]}' 포스팅! $${reward} 획득.`);
+                break;
+            case 'main':
+                if (stats.analysis < 60) {
+                    log("메인 키워드 경쟁에서 밀렸습니다. 체력만 낭비했습니다...");
+                    stats.hp -= 35;
+                } else {
+                    stats.money += 150;
+                    log("전략적 분석 성공! 메인 키워드가 상단에 노출되었습니다! (+$150)");
+                    stats.hp -= 45;
                 }
-            });
-        });
-
-        function gameLoop() {
-            if (energy <= 0) {
-                alert("에너지 고갈! 최종 수익: $" + score + "\n교훈: 작고 가능한 틈새 키워드로 꾸준히 수익을 쌓으세요.");
-                location.reload();
-                return;
-            }
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            spawn();
-            
-            keywords.forEach((kw, index) => {
-                kw.update();
-                kw.draw();
-                if (kw.life <= 0) keywords.splice(index, 1);
-            });
-
-            requestAnimationFrame(gameLoop);
+                break;
+            case 'rest':
+                stats.hp = Math.min(100, stats.hp + 45);
+                stats.conf += 2;
+                log("빵집 투어로 에너지를 충전합니다. 역시 빵이 최고야!");
+                break;
         }
 
-        gameLoop();
-    </script>
+        if (stats.money >= 1000) {
+            log("🎉 축하합니다! 월 1,000만 원 수익 달성! 은퇴 후 빵집을 차립니다.");
+            document.querySelectorAll('button').forEach(b => b.disabled = true);
+        }
+        update();
+    }
+</script>
+
 </body>
 </html>
