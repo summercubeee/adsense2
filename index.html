@@ -2,47 +2,145 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>블로거 메이커 : 1000만원의 길</title>
+    <title>애드센스 RPG - 틈새의 정복자</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap');
-        body { background: #222; color: #fff; font-family: 'DungGeunMo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #game-box { width: 700px; background: #3d2e2e; border: 8px double #c0a080; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        body { background: #111; color: #fff; font-family: 'DungGeunMo', sans-serif; margin: 0; overflow: hidden; }
         
-        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #c0a080; padding-bottom: 10px; margin-bottom: 15px; color: #ffd700; }
-        
-        .main-screen { display: flex; gap: 20px; height: 350px; }
-        
-        /* ⬇️ [수정된 부분] 생성된 이미지를 메인 화면 배경으로 적용 ⬇️ */
-        .visual-area { 
-            flex: 1; 
-            background-color: #1a1a1a; 
-            background-image: url('https://image.civitai.com/xG1nkqKTMz6b78440/animations/7257c7cb-77b3-461d-a94f-402a5e55b40c.gif'); /* 생성된 블로그 폭발 도트 이미지 URL */
-            background-size: cover; 
-            background-position: center;
-            border: 4px solid #5d4037; 
+        /* 게임 맵 (도트 감성 배경) */
+        #game-world { 
+            width: 100vw; height: 100vh; 
+            background-image: url('https://raw.githubusercontent.com/KenneyNL/Adobe-Animate-Extension/master/Example%20Assets/Backgrounds/background_0.png');
+            background-size: 800px; image-rendering: pixelated;
             position: relative; 
-            overflow: hidden; 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
         }
-        /* ⬆️ [수정 끝] ⬆️ */
 
-        .char-sprite { font-size: 80px; z-index: 2; margin-bottom: 20px; transition: 0.3s; text-shadow: 2px 2px 0 #000; }
-        
-        .status-area { width: 220px; background: #5d4037; padding: 15px; border-radius: 5px; font-size: 14px; line-height: 1.8; }
-        .stat-bar { background: #333; height: 10px; border-radius: 5px; margin-top: 4px; overflow: hidden; }
-        .bar-fill { background: #ff4757; height: 100%; transition: 0.5s; }
+        /* 캐릭터 (하종수 마케터) */
+        #player {
+            width: 64px; height: 64px;
+            background: url('https://kenney.nl/content/assets/pixel-platformer/Preview.png') -20px -20px;
+            background-size: 600px; image-rendering: pixelated;
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            transition: 0.1s; z-index: 10;
+        }
 
-        .log-area { height: 100px; background: #000; border: 2px solid #c0a080; margin: 15px 0; padding: 10px; font-size: 13px; color: #2ecc71; overflow-y: auto; text-align: left; }
-        
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { background: #8b4513; color: #fff; border: 2px solid #c0a080; padding: 12px; cursor: pointer; font-family: inherit; font-size: 15px; }
-        button:hover { background: #a0522d; }
-        button:disabled { background: #555; cursor: not-allowed; }
+        /* 몬스터 (키워드 몬스터) */
+        .monster {
+            width: 48px; height: 48px; position: absolute;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; text-align: center;
+            border-radius: 5px; box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
-        .modal-content { background: #3d2e2e; padding: 30px; border: 6px double #ffd700; text-align: center; }
+        /* 상단 UI 스테이터스 */
+        #ui-bar {
+            position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.8);
+            padding: 15px; border-bottom: 3px solid #ffd700;
+            display: flex; justify-content: space-around; z-index: 100;
+        }
+
+        .stat-item { color: #ffd700; font-size: 18px; }
+        .energy-bar { width: 150px; height: 15px; background: #333; border: 2px solid #fff; }
+        #energy-fill { width: 100%; height: 100%; background: #2ecc71; transition: 0.3s; }
+
+        /* 알림 메시지 */
+        #msg-box {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); padding: 10px 30px; border: 2px solid #fff;
+            color: #2ecc71; font-size: 16px; display: none;
+        }
     </style>
 </head>
 <body>
-    </body>
+
+<div id="ui-bar">
+    <div class="stat-item">💰 수익: $<span id="income">0</span></div>
+    <div class="stat-item">🧠 분석력: Lv.<span id="level">1</span></div>
+    <div class="stat-item">⚡ 에너지: <div class="energy-bar"><div id="energy-fill"></div></div></div>
+</div>
+
+<div id="game-world">
+    <div id="player"></div>
+</div>
+
+<div id="msg-box"></div>
+
+<script>
+    let player = { x: window.innerWidth/2, y: window.innerHeight/2, income: 0, level: 1, hp: 100 };
+    const gameWorld = document.getElementById('game-world');
+
+    // 몬스터 종류 (영상 컨셉)
+    const monsterTypes = [
+        { name: "틈새:전쟁지원금", color: "#3498db", value: 10, reqLv: 1, hp: 20 },
+        { name: "틈새:이재명지원금", color: "#3498db", value: 15, reqLv: 2, hp: 30 },
+        { name: "메인:고유가지원금", color: "#e74c3c", value: 150, reqLv: 10, hp: 200 }
+    ];
+
+    // 몬스터 생성
+    function spawnMonster() {
+        const type = monsterTypes[Math.random() < 0.8 ? 0 : (Math.random() < 0.9 ? 1 : 2)];
+        const m = document.createElement('div');
+        m.className = 'monster';
+        m.style.backgroundColor = type.color;
+        m.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+        m.style.top = Math.random() * (window.innerHeight - 100) + 100 + 'px';
+        m.innerHTML = type.name;
+        
+        m.onclick = () => fight(type, m);
+        gameWorld.appendChild(m);
+    }
+
+    // 전투 로직 (포스팅 과정)
+    function fight(type, element) {
+        if (player.hp <= 0) {
+            showMsg("지쳐서 글을 쓸 수 없습니다! (F5로 빵집 방문)");
+            return;
+        }
+
+        if (player.level < type.reqLv) {
+            showMsg(`분석력이 낮아 '${type.name}' 글을 써도 노출되지 않습니다!`);
+            player.hp -= 10;
+        } else {
+            player.income += type.value;
+            player.level += 0.5;
+            player.hp -= 5;
+            showMsg(`'${type.name}' 포스팅 성공! $${type.value} 수익 발생!`);
+            element.remove();
+            spawnMonster();
+        }
+        updateUI();
+    }
+
+    function showMsg(txt) {
+        const box = document.getElementById('msg-box');
+        box.innerText = txt;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 2000);
+    }
+
+    function updateUI() {
+        document.getElementById('income').innerText = Math.floor(player.income);
+        document.getElementById('level').innerText = Math.floor(player.level);
+        document.getElementById('energy-fill').style.width = player.hp + "%";
+    }
+
+    // 초기 몬스터 소환
+    for(let i=0; i<5; i++) spawnMonster();
+
+    // 키보드 조작 (간단히 위치 이동)
+    window.addEventListener('keydown', (e) => {
+        const speed = 20;
+        if(e.key === 'ArrowUp') player.y -= speed;
+        if(e.key === 'ArrowDown') player.y += speed;
+        if(e.key === 'ArrowLeft') player.x -= speed;
+        if(e.key === 'ArrowRight') player.x += speed;
+        
+        const p = document.getElementById('player');
+        p.style.left = player.x + 'px';
+        p.style.top = player.y + 'px';
+    });
+
+</script>
+</body>
 </html>
