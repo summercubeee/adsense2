@@ -3,402 +3,187 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>본질센스 액션 RPG</title>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <title>본질센스 액션 RPG - 확장판</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      width: 100%; height: 100%; overflow: hidden; touch-action: none;
       background:
-        radial-gradient(circle at top, rgba(0,255,153,0.08), transparent 28%),
-        radial-gradient(circle at right, rgba(56,189,248,0.08), transparent 24%),
-        #06070b;
-      font-family: 'Satoshi', sans-serif;
-      color: #f8fafc;
-      touch-action: none;
+        radial-gradient(circle at top, rgba(0,255,153,0.12), transparent 26%),
+        radial-gradient(circle at right, rgba(56,189,248,0.12), transparent 24%),
+        linear-gradient(180deg, #04060a 0%, #060a12 100%);
+      font-family: 'Satoshi', sans-serif; color: #f8fafc;
     }
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 12px;
-      gap: 12px;
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      padding: 10px; gap: 10px;
     }
     #wrap {
-      position: relative;
-      width: min(760px, 100vw);
-      height: min(760px, calc(100vw + 40px));
-      max-height: calc(100dvh - 150px);
-      background: #000;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.08);
-      flex-shrink: 0;
+      position: relative; width: min(860px, 100vw); height: min(860px, calc(100vw + 10px));
+      max-height: calc(100dvh - 150px); background: #000; border-radius: 24px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 30px 80px rgba(0,0,0,0.48); flex-shrink: 0;
     }
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-    }
-    #ui {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 3;
+    canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+    #ui { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+    .glass {
+      background: rgba(7,10,15,0.72); border: 1px solid rgba(148,163,184,0.12);
+      backdrop-filter: blur(10px); box-shadow: 0 14px 34px rgba(0,0,0,0.24);
     }
     .top-hud {
-      position: absolute;
-      inset: 14px 14px auto 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
+      position: absolute; inset: 12px 12px auto 12px; display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px;
     }
-    .brand-box, .stat-box, #dialog-box, #quest-box {
-      backdrop-filter: blur(10px);
-      background: rgba(7, 10, 15, 0.78);
-      border: 1px solid rgba(148,163,184,0.12);
-      box-shadow: 0 14px 34px rgba(0,0,0,0.28);
-    }
-    .brand-box {
-      padding: 12px 14px;
-      border-radius: 16px;
-      min-width: 240px;
-    }
+    .brand-box { padding: 12px 14px; border-radius: 18px; width: min(370px, 58vw); }
     .brand-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #00ff99;
-      background: rgba(0,255,153,0.08);
-      border: 1px solid rgba(0,255,153,0.18);
-      margin-bottom: 8px;
-      letter-spacing: .05em;
+      display: inline-flex; padding: 6px 10px; border-radius: 999px; color: #00ff99;
+      background: rgba(0,255,153,0.08); border: 1px solid rgba(0,255,153,0.18);
+      font-size: 11px; font-weight: 800; margin-bottom: 8px; letter-spacing: .05em;
     }
-    .brand-title {
-      font-size: clamp(18px, 3vw, 24px);
-      font-weight: 700;
-      line-height: 1.15;
-      margin-bottom: 5px;
-    }
-    .brand-sub {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.55;
-    }
-    .stats {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      max-width: 360px;
-    }
-    .stat-box {
-      min-width: 102px;
-      padding: 11px 12px;
-      border-radius: 16px;
-    }
-    .stat-label {
-      font-size: 11px;
-      color: #94a3b8;
-      margin-bottom: 4px;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-    }
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
+    .brand-title { font-size: clamp(20px, 3vw, 28px); font-weight: 900; line-height: 1.06; margin-bottom: 6px; letter-spacing: -0.03em; }
+    .brand-sub { font-size: 12px; color: #94a3b8; line-height: 1.55; }
+    .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .stat-box { min-width: 98px; padding: 10px 12px; border-radius: 16px; }
+    .stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .stat-value { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-    #quest-box {
-      position: absolute;
-      right: 14px;
-      top: 118px;
-      width: min(250px, 42vw);
-      border-radius: 16px;
-      padding: 12px 14px;
+    #left-box, #quest-box, #dialog-box {
+      position: absolute; border-radius: 18px; padding: 12px 14px;
     }
-    #quest-title {
-      color: #00ff99;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-    #quest-text {
-      font-size: 12px;
-      color: #dbe4ee;
-      line-height: 1.65;
-    }
+    #left-box { left: 12px; top: 112px; width: min(250px, 42vw); }
+    #quest-box { right: 12px; top: 112px; width: min(270px, 44vw); }
+    .hud-title { color: #00ff99; font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: .05em; }
+    .hud-text { color: #dbe4ee; font-size: 12px; line-height: 1.65; }
+    .small-list { display: grid; gap: 6px; }
+    .small-line { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #e6edf6; }
+    .small-line span:last-child { color: #94a3b8; }
 
-    #dialog-box {
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      padding: 14px 16px;
-      border-radius: 18px;
-    }
-    #dialog-speaker {
-      font-size: 12px;
-      font-weight: 700;
-      color: #00ff99;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    #dialog-text {
-      font-size: 14px;
-      line-height: 1.7;
-      color: #f8fafc;
-    }
+    #dialog-box { left: 12px; right: 12px; bottom: 12px; }
+    #dialog-speaker { font-size: 12px; font-weight: 800; margin-bottom: 5px; color: #00ff99; text-transform: uppercase; letter-spacing: .05em; }
+    #dialog-text { font-size: 14px; line-height: 1.7; color: #f8fafc; }
 
     #start-screen, #result-screen {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      background: rgba(4, 7, 13, 0.88);
-      backdrop-filter: blur(8px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      padding: 24px;
-      text-align: center;
+      position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
+      padding: 20px; background: rgba(3,6,12,0.84); backdrop-filter: blur(10px);
     }
     #result-screen { display: none; }
     .overlay-card {
-      width: min(640px, 100%);
-      padding: 24px;
-      border-radius: 24px;
-      background:
-        linear-gradient(180deg, rgba(0,255,153,0.05), transparent 28%),
-        rgba(10, 14, 24, 0.95);
-      border: 1px solid rgba(148,163,184,0.1);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      width: min(720px, 100%); padding: 26px; border-radius: 28px;
+      background: linear-gradient(180deg, rgba(0,255,153,0.05), transparent 26%), rgba(10,14,24,0.94);
+      border: 1px solid rgba(148,163,184,0.1); box-shadow: 0 30px 80px rgba(0,0,0,0.45); text-align: center;
     }
-    .overlay-chip {
-      display: inline-flex;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(0,255,153,0.08);
-      border: 1px solid rgba(0,255,153,0.16);
-      color: #00ff99;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    .overlay-card h1 {
-      font-size: clamp(30px, 6vw, 48px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-      margin-bottom: 12px;
-    }
-    .overlay-card p {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.8;
-      margin-bottom: 18px;
-    }
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 18px;
-      text-align: left;
-    }
-    .feature {
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(148,163,184,0.08);
-    }
-    .feature b {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-    .feature span {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.65;
-    }
+    .overlay-card h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.02; letter-spacing: -0.04em; margin: 10px 0 14px; }
+    .overlay-card p { color: #94a3b8; font-size: 14px; line-height: 1.8; margin-bottom: 18px; }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; text-align: left; }
+    .feature { padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(148,163,184,0.08); }
+    .feature b { display: block; margin-bottom: 6px; font-size: 14px; }
+    .feature span { color: #94a3b8; font-size: 12px; line-height: 1.65; }
     .start-btn {
-      border: none;
-      border-radius: 18px;
-      background: linear-gradient(90deg, #00ff99, #38bdf8);
-      color: #02110d;
-      padding: 15px 30px;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      min-width: 220px;
+      border: none; border-radius: 18px; background: linear-gradient(90deg, #00ff99, #38bdf8); color: #02110d;
+      padding: 15px 30px; font-size: 17px; font-weight: 900; cursor: pointer; min-width: 230px;
+      box-shadow: 0 18px 38px rgba(0,255,153,0.18);
     }
 
     #touch-controls {
-      width: min(760px, 100vw);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      padding: 0 6px;
-      flex-shrink: 0;
+      width: min(860px, 100vw); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 6px; flex-shrink: 0;
     }
-    #dpad {
-      position: relative;
-      width: 156px;
-      height: 156px;
-      flex-shrink: 0;
-    }
+    #dpad { position: relative; width: 156px; height: 156px; flex-shrink: 0; }
     .dpad-btn {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,255,153,0.26);
-      background: rgba(0,255,153,0.12);
-      color: #00ff99;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      user-select: none;
-      -webkit-user-select: none;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      position: absolute; width: 50px; height: 50px; border-radius: 14px; border: 1px solid rgba(0,255,153,0.28);
+      background: rgba(0,255,153,0.13); color: #00ff99; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; user-select: none; -webkit-user-select: none; box-shadow: 0 10px 24px rgba(0,0,0,0.18);
     }
     #btn-up { top: 0; left: 53px; }
     #btn-down { bottom: 0; left: 53px; }
     #btn-left { left: 0; top: 53px; }
     #btn-right { right: 0; top: 53px; }
-    #btn-center {
-      position: absolute;
-      top: 53px;
-      left: 53px;
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .action-cluster {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
+    #btn-center { position: absolute; top: 53px; left: 53px; width: 50px; height: 50px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
+    .action-cluster { display: flex; gap: 10px; align-items: center; }
     .action-btn {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      border: 2px solid rgba(56,189,248,0.35);
-      background: rgba(56,189,248,0.14);
-      color: #e0f2fe;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 11px;
-      font-weight: 700;
-      user-select: none;
-      -webkit-user-select: none;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-      text-align: center;
-      padding: 8px;
+      width: 90px; height: 90px; border-radius: 50%; border: 2px solid rgba(56,189,248,0.34); background: rgba(56,189,248,0.15);
+      color: #e0f2fe; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 3px;
+      font-size: 11px; font-weight: 800; text-align: center; user-select: none; -webkit-user-select: none; box-shadow: 0 10px 24px rgba(0,0,0,0.18); padding: 8px;
     }
-    .dpad-btn:active, .action-btn:active {
-      transform: translateY(1px);
-      background: rgba(0,255,153,0.26);
-    }
+    .dpad-btn:active, .action-btn:active { transform: translateY(1px) scale(.98); }
 
-    @media (max-width: 720px) {
-      body { padding: 8px; }
+    @media (max-width: 760px) {
       #wrap { border-radius: 18px; max-height: calc(100dvh - 210px); }
       .top-hud { flex-direction: column; }
-      .stats { justify-content: flex-start; max-width: none; }
-      #quest-box {
-        top: auto;
-        right: 14px;
-        bottom: 112px;
-        left: auto;
-        width: min(220px, 48vw);
-      }
+      .brand-box { width: 100%; }
+      .stats { justify-content: flex-start; }
+      #left-box { width: min(220px, 48vw); }
+      #quest-box { right: 12px; top: auto; bottom: 116px; width: min(220px, 48vw); }
       .features { grid-template-columns: 1fr; }
-      #touch-controls { gap: 8px; }
-      .action-btn { width: 82px; height: 82px; }
-      #dpad { width: 138px; height: 138px; }
-      .dpad-btn { width: 44px; height: 44px; }
-      #btn-up { left: 47px; }
-      #btn-down { left: 47px; }
-      #btn-left { top: 47px; }
-      #btn-right { top: 47px; }
-      #btn-center { top: 47px; left: 47px; width: 44px; height: 44px; }
       #dialog-text { font-size: 13px; }
     }
   </style>
 </head>
 <body>
   <div id="wrap">
-    <canvas id="c" width="760" height="760"></canvas>
+    <canvas id="c" width="860" height="860"></canvas>
 
     <div id="ui">
       <div class="top-hud">
-        <div class="brand-box">
-          <div class="brand-chip">◆ BONJIL SENSE ACTION RPG</div>
-          <div class="brand-title">본질센스 액션 RPG</div>
-          <div class="brand-sub">직접 캐릭터를 움직이며 탐색하고, 적과 싸우고, 본질 조각을 수집하세요.</div>
+        <div class="brand-box glass">
+          <div class="brand-chip">◆ BONJIL SENSE EXPANDED</div>
+          <div class="brand-title">상호작용 확장판 액션 RPG</div>
+          <div class="brand-sub">상자, 표지판, 샘, 상인, 점프패드, 문서, 조각, NPC 대화까지 늘리고, 박사님 상호작용 오류도 고쳤습니다.</div>
         </div>
         <div class="stats">
-          <div class="stat-box"><div class="stat-label">HP</div><div class="stat-value" id="hp-ui">100 / 100</div></div>
-          <div class="stat-box"><div class="stat-label">Gold</div><div class="stat-value" id="gold-ui">0</div></div>
-          <div class="stat-box"><div class="stat-label">Core</div><div class="stat-value" id="core-ui">0 / 4</div></div>
+          <div class="stat-box glass"><div class="stat-label">HP</div><div class="stat-value" id="hp-ui">120 / 120</div></div>
+          <div class="stat-box glass"><div class="stat-label">Gold</div><div class="stat-value" id="gold-ui">0</div></div>
+          <div class="stat-box glass"><div class="stat-label">Core</div><div class="stat-value" id="core-ui">0 / 6</div></div>
+          <div class="stat-box glass"><div class="stat-label">Combo</div><div class="stat-value" id="combo-ui">0x</div></div>
         </div>
       </div>
 
-      <div id="quest-box">
-        <div id="quest-title">현재 목표</div>
-        <div id="quest-text">필드 곳곳의 본질 조각 4개를 모으고, 중앙의 박사님에게 돌아가세요.</div>
+      <div id="left-box" class="glass">
+        <div class="hud-title">조작 / 오브젝트</div>
+        <div class="small-list">
+          <div class="small-line"><span>이동</span><span>방향키</span></div>
+          <div class="small-line"><span>공격 / 상호작용</span><span>Z</span></div>
+          <div class="small-line"><span>대시</span><span>X</span></div>
+          <div class="small-line"><span>열 수 있는 상자</span><span>📦</span></div>
+          <div class="small-line"><span>회복의 샘</span><span>💧</span></div>
+          <div class="small-line"><span>표지판 / 문서</span><span>🪧 📜</span></div>
+          <div class="small-line"><span>점프 패드</span><span>🌀</span></div>
+        </div>
       </div>
 
-      <div id="dialog-box">
+      <div id="quest-box" class="glass">
+        <div class="hud-title">현재 목표</div>
+        <div class="hud-text" id="quest-text">필드의 본질 조각을 모으고, 각종 상호작용 오브젝트를 활용해 박사님에게 돌아가세요.</div>
+      </div>
+
+      <div id="dialog-box" class="glass">
         <div id="dialog-speaker">시스템 알림</div>
-        <div id="dialog-text">방향키 또는 아래 조작 버튼으로 이동하고, Z / 공격 버튼으로 액션하세요.</div>
+        <div id="dialog-text">박사님 근처에서 Z를 누르면 대화됩니다. 이번 버전은 NPC 우선 상호작용 범위를 넓혀 고쳤습니다.</div>
       </div>
     </div>
 
     <div id="start-screen">
       <div class="overlay-card">
-        <div class="overlay-chip">실제 조작형 버전</div>
-        <h1>캐릭터를 직접 움직이는<br>액션 RPG로 바꿨습니다.</h1>
+        <div class="brand-chip">확장판</div>
+        <h1>환경 상호작용을<br>훨씬 많이 넣었습니다.</h1>
         <p>
-          키보드 방향키로 이동하고, Z 키로 공격 및 상호작용을 합니다.
-          필드를 탐험하며 적을 쓰러뜨리고, 본질 조각을 모아 마지막 대화를 완료하면 클리어입니다.
+          이번에는 단순한 적 처치만이 아니라, 상자 열기, 표지판 읽기, 문서 수집, 회복 샘, 상인, 점프패드 등
+          실제 RPG처럼 만질 수 있는 오브젝트를 더 늘렸습니다. 그리고 박사님한테 안 들어가지는 문제는
+          상호작용 우선순위와 범위를 다시 잡아 수정했습니다.
         </p>
         <div class="features">
-          <div class="feature"><b>직접 이동</b><span>위·아래·좌·우로 실제 게임처럼 탐험합니다.</span></div>
-          <div class="feature"><b>간단 전투</b><span>근접 공격 한 가지로 쉽게 이해되는 구조입니다.</span></div>
-          <div class="feature"><b>모바일 지원</b><span>하단 가상패드와 액션 버튼으로도 플레이됩니다.</span></div>
+          <div class="feature"><b>오브젝트 증가</b><span>환경을 돌아다니는 재미가 커집니다.</span></div>
+          <div class="feature"><b>NPC 버그 수정</b><span>박사님 근처에서 Z 상호작용이 더 잘 들어갑니다.</span></div>
+          <div class="feature"><b>탐험 강화</b><span>전투 외에도 할 일이 많아졌습니다.</span></div>
         </div>
-        <button class="start-btn" id="start-btn">▶ 탐험 시작</button>
+        <button class="start-btn" id="start-btn">▶ 확장판 시작</button>
       </div>
     </div>
 
     <div id="result-screen">
       <div class="overlay-card">
-        <div class="overlay-chip">MISSION CLEAR</div>
-        <h1>본질 구조를 회수했습니다.</h1>
-        <p id="result-text">수집한 조각과 전투 기록을 바탕으로 결과가 표시됩니다.</p>
+        <div class="brand-chip">MISSION CLEAR</div>
+        <h1>본질 구조를 완성했습니다.</h1>
+        <p id="result-text">결과가 여기에 표시됩니다.</p>
         <button class="start-btn" onclick="location.reload()">다시 플레이</button>
       </div>
     </div>
@@ -413,10 +198,8 @@
       <div id="btn-center"></div>
     </div>
     <div class="action-cluster">
-      <div class="action-btn" id="btn-attack">
-        <span style="font-size:22px;">⚔️</span>
-        <span>공격 / 상호작용</span>
-      </div>
+      <div class="action-btn" id="btn-dash"><span style="font-size:22px;">💨</span><span>대시</span></div>
+      <div class="action-btn" id="btn-attack"><span style="font-size:22px;">⚔️</span><span>공격/Z</span></div>
     </div>
   </div>
 
@@ -425,95 +208,107 @@
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    const W = canvas.width;
-    const H = canvas.height;
-    const WORLD_W = 1600;
-    const WORLD_H = 1200;
-    const TILE = 80;
-    const SPEED = 220;
-    const PLAYER_SIZE = 26;
-    const ATTACK_RANGE = 66;
-    const INTERACT_RANGE = 70;
+    const W = canvas.width, H = canvas.height;
+    const WORLD_W = 2200, WORLD_H = 1600, TILE = 80;
+    const BASE_SPEED = 270;
+    const ATTACK_RANGE = 84;
+    const INTERACT_RANGE = 92;
+    const NPC_INTERACT_RANGE = 126;
 
     const Input = { keys: {}, justPressed: {} };
 
     const state = {
       phase: 'start',
       player: {
-        x: 200,
-        y: 860,
-        w: PLAYER_SIZE,
-        h: PLAYER_SIZE,
-        speed: SPEED,
-        dir: 'down',
-        hp: 100,
-        maxHp: 100,
-        gold: 0,
-        core: 0,
-        attackCooldown: 0,
-        invincible: 0,
-        attackFlash: 0,
-        step: 0,
-        stepTimer: 0
+        x: 240, y: 1210, hp: 120, maxHp: 120, gold: 0, core: 0,
+        dir: 'down', speed: BASE_SPEED, attackCooldown: 0, attackFlash: 0,
+        dashCooldown: 0, dashTime: 0, invincible: 0, combo: 0, comboTimer: 0,
+        comboStep: 0, trail: []
       },
-      cam: { x: 0, y: 0 },
-      messageTimer: 0,
+      cam: { x: 0, y: 0, zoomPulse: 0 },
       shake: 0,
       kills: 0,
-      master: { x: 790, y: 170, talked: false },
+      resultShown: false,
+      master: { x: 1100, y: 180 },
+      merchant: { x: 1840, y: 220, bought: false },
       shards: [
-        { x: 290, y: 290, got: false, text: '기술은 시작점일 뿐, 구조를 대신하지 못한다.' },
-        { x: 1280, y: 260, got: false, text: '만체리는 잠재 트래픽과 노출 가능성을 함께 본다.' },
-        { x: 1320, y: 920, got: false, text: '사업화는 다회성 트래픽과 전환 구조를 세우는 일이다.' },
-        { x: 400, y: 980, got: false, text: '코어는 내가 좋아하며 실제로 오래 되는 사업이다.' }
+        { x: 280, y: 260, got: false, text: '기술은 진입점이지만, 구조가 아니면 오래 못 간다.' },
+        { x: 1720, y: 240, got: false, text: '만체리는 잠재 수요와 노출 가능성을 같이 본다.' },
+        { x: 1900, y: 1060, got: false, text: '사업화는 유입을 돈으로 바꾸는 설계다.' },
+        { x: 360, y: 1380, got: false, text: '코어는 오래 해도 버티는 방향이다.' },
+        { x: 1030, y: 760, got: false, text: '브랜딩은 신뢰를 압축해 전환율을 올린다.' },
+        { x: 1450, y: 1390, got: false, text: '레버리지는 같은 시간을 더 크게 바꾼다.' }
       ],
-      enemies: [
-        { x: 520, y: 560, hp: 34, maxHp: 34, type: 'past', speed: 65, alive: true, hit: 0 },
-        { x: 1140, y: 450, hp: 42, maxHp: 42, type: 'bench', speed: 72, alive: true, hit: 0 },
-        { x: 1160, y: 880, hp: 55, maxHp: 55, type: 'labor', speed: 78, alive: true, hit: 0 },
-        { x: 650, y: 980, hp: 48, maxHp: 48, type: 'crowd', speed: 80, alive: true, hit: 0 }
+      chests: [
+        { x: 480, y: 430, opened: false, reward: 'gold', amount: 28 },
+        { x: 1280, y: 520, opened: false, reward: 'heal', amount: 32 },
+        { x: 1960, y: 1260, opened: false, reward: 'gold', amount: 40 },
+        { x: 880, y: 1280, opened: false, reward: 'dash', amount: 0 }
       ],
-      resultShown: false
+      signs: [
+        { x: 620, y: 250, text: '표지판: 검색량만 보지 말고 경쟁과 전환까지 보라.' },
+        { x: 1560, y: 640, text: '표지판: 다회성 구조가 없으면 수익은 매번 처음으로 돌아간다.' },
+        { x: 760, y: 1480, text: '표지판: 코어가 없는 성장은 오래 못 간다.' }
+      ],
+      papers: [
+        { x: 1440, y: 340, read: false, text: '문서: 가격×수 구조를 보며 무엇이 사업이 되는지 판단한다.' },
+        { x: 1740, y: 820, read: false, text: '문서: 전환율은 신뢰, 제안, 맥락의 합이다.' },
+        { x: 1240, y: 1460, read: false, text: '문서: 트래픽은 입구이고, 사업화는 내부 구조다.' }
+      ],
+      fountains: [
+        { x: 560, y: 1120, cooldown: 0 },
+        { x: 1620, y: 1180, cooldown: 0 }
+      ],
+      jumpPads: [
+        { x: 960, y: 1370, tx: 1820, ty: 980 },
+        { x: 310, y: 640, tx: 980, ty: 280 }
+      ],
+      enemies: [],
+      particles: []
     };
 
-    const enemyConf = {
-      past:  { emoji: '📼', name: '과거 이슈', color: '#94a3b8', line: '이미 식은 키워드에 매달리고 있다.' },
-      bench: { emoji: '🪞', name: '겉핥기 벤치', color: '#a855f7', line: '겉모습만 따라 한 구조는 오래 못 간다.' },
-      labor: { emoji: '⛓️', name: '노동형 구조', color: '#fb923c', line: '시간은 쓰지만 남는 것은 적다.' },
-      crowd: { emoji: '🔥', name: '포화 경쟁', color: '#f87171', line: '수요는 많지만 경쟁도 너무 높다.' }
-    };
+    const enemyTypes = [
+      { type: 'past', emoji: '📼', name: '과거 이슈', color: '#94a3b8', hp: 28, speed: 90, atk: 8 },
+      { type: 'bench', emoji: '🪞', name: '겉핥기 벤치', color: '#a855f7', hp: 34, speed: 100, atk: 10 },
+      { type: 'labor', emoji: '⛓️', name: '노동형 구조', color: '#fb923c', hp: 42, speed: 110, atk: 12 },
+      { type: 'crowd', emoji: '🔥', name: '포화 경쟁', color: '#f87171', hp: 38, speed: 125, atk: 11 }
+    ];
 
     const obstacles = [
-      { x: 120, y: 120, w: 240, h: 120 },
-      { x: 620, y: 90, w: 360, h: 140 },
-      { x: 1160, y: 130, w: 220, h: 150 },
-      { x: 180, y: 520, w: 180, h: 220 },
-      { x: 760, y: 470, w: 240, h: 180 },
-      { x: 1240, y: 620, w: 220, h: 170 },
-      { x: 280, y: 1040, w: 320, h: 90 },
-      { x: 820, y: 920, w: 260, h: 120 }
+      { x: 120, y: 100, w: 280, h: 120 }, { x: 760, y: 90, w: 430, h: 140 }, { x: 1570, y: 120, w: 280, h: 150 },
+      { x: 170, y: 520, w: 220, h: 240 }, { x: 760, y: 470, w: 340, h: 200 }, { x: 1510, y: 610, w: 260, h: 180 },
+      { x: 300, y: 1120, w: 360, h: 120 }, { x: 1010, y: 1010, w: 280, h: 140 }, { x: 1680, y: 1320, w: 260, h: 120 }
     ];
+
+    function spawnInitialEnemies() {
+      state.enemies = [
+        makeEnemy(560, 590), makeEnemy(1250, 500), makeEnemy(1600, 860), makeEnemy(720, 1050),
+        makeEnemy(1160, 1230), makeEnemy(1810, 1200), makeEnemy(1450, 980)
+      ];
+    }
+    function makeEnemy(x, y) {
+      const base = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+      return { x, y, hp: base.hp, maxHp: base.hp, speed: base.speed, atk: base.atk, alive: true, hit: 0, knockX: 0, knockY: 0, ...base };
+    }
 
     function setDialog(speaker, text) {
       const sp = document.getElementById('dialog-speaker');
       sp.textContent = speaker;
-      sp.style.color =
-        speaker === '박사님' ? '#00ff99' :
-        speaker.includes('적') ? '#fb923c' :
-        speaker.includes('시스템') ? '#38bdf8' : '#00ff99';
+      sp.style.color = speaker === '박사님' ? '#00ff99' : speaker === '상인' ? '#facc15' : speaker.includes('적') ? '#fb923c' : '#38bdf8';
       document.getElementById('dialog-text').textContent = text;
-      state.messageTimer = 3.5;
     }
 
     function updateHud() {
-      document.getElementById('hp-ui').textContent = `${Math.max(0, state.player.hp)} / ${state.player.maxHp}`;
-      document.getElementById('gold-ui').textContent = state.player.gold;
-      document.getElementById('core-ui').textContent = `${state.player.core} / ${state.shards.length}`;
+      const p = state.player;
+      document.getElementById('hp-ui').textContent = `${Math.max(0,p.hp)} / ${p.maxHp}`;
+      document.getElementById('gold-ui').textContent = p.gold;
+      document.getElementById('core-ui').textContent = `${p.core} / ${state.shards.length}`;
+      document.getElementById('combo-ui').textContent = `${p.combo}x`;
 
       const allGot = state.shards.every(s => s.got);
       document.getElementById('quest-text').textContent = allGot
-        ? '모든 본질 조각을 모았습니다. 중앙 상단의 박사님에게 돌아가 결과를 완성하세요.'
-        : `필드 곳곳의 본질 조각 ${state.shards.length}개 중 ${state.player.core}개를 모으고, 적을 피하거나 쓰러뜨리며 탐험하세요.`;
+        ? '모든 조각을 회수했습니다. 이번엔 박사님에게 가까이 붙어 Z를 누르면 바로 대화가 됩니다.'
+        : `조각 ${state.shards.length}개 중 ${p.core}개 수집. 상자, 샘, 상인, 문서를 활용하며 탐험하세요.`;
     }
 
     function bindHoldButton(id, code) {
@@ -523,78 +318,67 @@
       el.addEventListener('touchstart', on, { passive: false });
       el.addEventListener('touchend', off, { passive: false });
       el.addEventListener('touchcancel', off, { passive: false });
-      el.addEventListener('mousedown', on);
-      el.addEventListener('mouseup', off);
-      el.addEventListener('mouseleave', off);
+      el.addEventListener('mousedown', on); el.addEventListener('mouseup', off); el.addEventListener('mouseleave', off);
     }
-
     bindHoldButton('btn-up', 'ArrowUp');
     bindHoldButton('btn-down', 'ArrowDown');
     bindHoldButton('btn-left', 'ArrowLeft');
     bindHoldButton('btn-right', 'ArrowRight');
 
-    const attackBtn = document.getElementById('btn-attack');
-    const attackPress = e => { e.preventDefault(); Input.justPressed['KeyZ'] = true; };
-    attackBtn.addEventListener('touchstart', attackPress, { passive: false });
-    attackBtn.addEventListener('mousedown', attackPress);
+    function bindTap(id, code) {
+      const el = document.getElementById(id);
+      const press = e => { e.preventDefault(); Input.justPressed[code] = true; };
+      el.addEventListener('touchstart', press, { passive: false });
+      el.addEventListener('mousedown', press);
+    }
+    bindTap('btn-attack', 'KeyZ');
+    bindTap('btn-dash', 'KeyX');
 
     document.addEventListener('keydown', e => {
       if (!Input.keys[e.code]) Input.justPressed[e.code] = true;
       Input.keys[e.code] = true;
-      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyZ','Space'].includes(e.code)) e.preventDefault();
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyZ','KeyX','Space'].includes(e.code)) e.preventDefault();
     });
     document.addEventListener('keyup', e => Input.keys[e.code] = false);
 
-    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-
-    function rectsOverlap(a, b) {
-      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-    }
-
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    function rectsOverlap(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
     function canMoveTo(nx, ny) {
-      const box = { x: nx - 14, y: ny - 10, w: 28, h: 20 };
+      const box = { x: nx - 14, y: ny - 12, w: 28, h: 24 };
       if (box.x < 0 || box.y < 0 || box.x + box.w > WORLD_W || box.y + box.h > WORLD_H) return false;
       for (const o of obstacles) if (rectsOverlap(box, o)) return false;
       return true;
     }
+    function worldToScreen(x, y) { return { x: x - state.cam.x, y: y - state.cam.y }; }
 
-    function drawRoundedRect(x, y, w, h, r, fill, stroke) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-      if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+    function particle(x, y, color, count = 10, speed = 120) {
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2, s = speed * (0.4 + Math.random() * 0.8);
+        state.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0.5 + Math.random() * 0.25, maxLife: 0.5 + Math.random() * 0.25, color, size: 2 + Math.random() * 4 });
+      }
     }
-
-    function worldToScreen(x, y) {
-      return { x: x - state.cam.x, y: y - state.cam.y };
+    function drawRoundedRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
     }
 
     function drawWorld() {
-      ctx.clearRect(0, 0, W, H);
-      ctx.save();
-      if (state.shake > 0) {
-        ctx.translate((Math.random() - .5) * state.shake * 5, (Math.random() - .5) * state.shake * 5);
-        state.shake = Math.max(0, state.shake - 0.12);
-      }
+      ctx.clearRect(0, 0, W, H); ctx.save();
+      if (state.shake > 0) { ctx.translate((Math.random()-.5)*state.shake*7, (Math.random()-.5)*state.shake*7); state.shake = Math.max(0, state.shake - 0.18); }
+      const pulse = state.cam.zoomPulse;
+      if (pulse > 0) { const scale = 1 + pulse * 0.015; ctx.translate(W/2, H/2); ctx.scale(scale, scale); ctx.translate(-W/2, -H/2); }
 
       const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#0b1220');
-      grad.addColorStop(.55, '#0e1726');
-      grad.addColorStop(1, '#081018');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      grad.addColorStop(0, '#08111d'); grad.addColorStop(.5, '#0c1623'); grad.addColorStop(1, '#071019');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
       for (let y = 0; y < WORLD_H; y += TILE) {
         for (let x = 0; x < WORLD_W; x += TILE) {
           const s = worldToScreen(x, y);
           if (s.x > W || s.y > H || s.x + TILE < 0 || s.y + TILE < 0) continue;
           const checker = ((x / TILE) + (y / TILE)) % 2;
-          ctx.fillStyle = checker ? '#102030' : '#0d1a28';
+          ctx.fillStyle = checker ? '#0f2032' : '#0c1a2a';
           ctx.fillRect(s.x, s.y, TILE, TILE);
           ctx.strokeStyle = 'rgba(255,255,255,0.025)';
           ctx.strokeRect(s.x, s.y, TILE, TILE);
@@ -604,221 +388,209 @@
       for (const o of obstacles) {
         const s = worldToScreen(o.x, o.y);
         drawRoundedRect(s.x, s.y, o.w, o.h, 16, '#111827', 'rgba(56,189,248,0.12)');
-        ctx.fillStyle = 'rgba(0,255,153,0.035)';
-        ctx.fillRect(s.x + 8, s.y + 8, o.w - 16, o.h - 16);
+        ctx.fillStyle = 'rgba(0,255,153,0.04)'; ctx.fillRect(s.x + 8, s.y + 8, o.w - 16, o.h - 16);
       }
 
-      drawMaster();
-      drawShards();
-      drawEnemies();
-      drawPlayer();
-      drawAttackArc();
+      drawJumpPads(); drawFountains(); drawChests(); drawSigns(); drawPapers(); drawMerchant(); drawMaster(); drawShards(); drawEnemies(); drawParticles(); drawPlayerTrail(); drawPlayer(); drawAttackArc();
       ctx.restore();
     }
 
-    function drawPlayer() {
-      const p = state.player;
-      const s = worldToScreen(p.x, p.y);
-      const bob = Math.sin(p.step * 2) * 1.6;
-      ctx.fillStyle = 'rgba(0,0,0,.35)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(s.x - 10, s.y - 6 + bob, 8, 16);
-      ctx.fillRect(s.x + 2, s.y - 6 - bob, 8, 16);
-
-      ctx.fillStyle = '#0ea5e9';
-      ctx.fillRect(s.x - 13, s.y - 26, 26, 22);
-      ctx.fillStyle = '#fcd34d';
-      ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(s.x - 11, s.y - 46, 22, 8);
-      ctx.fillRect(s.x - 13, s.y - 44, 3, 12);
-      ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(s.x - 6, s.y - 37, 4, 4);
-      ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
-
-      if (p.invincible > 0 && Math.floor(p.invincible * 10) % 2 === 0) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(s.x - 16, s.y - 50, 32, 62);
+    function drawPlayerTrail() {
+      for (const t of state.player.trail) {
+        const s = worldToScreen(t.x, t.y);
+        ctx.globalAlpha = t.life / t.maxLife * 0.28; ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(s.x, s.y - 12, 16, 0, Math.PI*2); ctx.fill();
       }
+      ctx.globalAlpha = 1;
     }
-
+    function drawPlayer() {
+      const p = state.player, s = worldToScreen(p.x, p.y), runBob = Math.sin(Date.now()/80) * (p.dashTime > 0 ? 1 : 2);
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(s.x, s.y + 18, 18 + (p.dashTime > 0 ? 4 : 0), 7, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(s.x - 10, s.y - 6 + runBob, 8, 16); ctx.fillRect(s.x + 2, s.y - 6 - runBob, 8, 16);
+      ctx.fillStyle = '#0ea5e9'; ctx.fillRect(s.x - 13, s.y - 26, 26, 22);
+      ctx.fillStyle = '#fcd34d'; ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(s.x - 11, s.y - 46, 22, 8); ctx.fillRect(s.x - 13, s.y - 44, 3, 12); ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(s.x - 6, s.y - 37, 4, 4); ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
+      if (p.dashTime > 0) { ctx.strokeStyle = 'rgba(56,189,248,0.65)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(s.x, s.y - 14, 22, 0, Math.PI*2); ctx.stroke(); }
+      if (p.invincible > 0 && Math.floor(p.invincible * 12) % 2 === 0) { ctx.strokeStyle = 'rgba(255,255,255,0.42)'; ctx.lineWidth = 2; ctx.strokeRect(s.x - 18, s.y - 50, 36, 64); }
+    }
     function drawEnemyUnit(e) {
       const s = worldToScreen(e.x, e.y);
-      const conf = enemyConf[e.type];
-      ctx.fillStyle = 'rgba(0,0,0,.35)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 14, 18, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.save();
-      ctx.translate(s.x, s.y);
-      if (e.hit > 0) ctx.translate((Math.random() - .5) * 3, 0);
-
-      ctx.fillStyle = conf.color;
-      ctx.beginPath();
-      ctx.arc(0, -10, 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#0b1020';
-      ctx.font = '20px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(conf.emoji, 0, -10);
-
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      drawRoundedRect(-28, -50, 56, 18, 8, 'rgba(0,0,0,0.5)');
-      ctx.fillStyle = '#fff';
-      ctx.font = '10px Satoshi, sans-serif';
-      ctx.fillText(conf.name, 0, -38);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.fillRect(-22, 18, 44, 6);
-      ctx.fillStyle = conf.color;
-      ctx.fillRect(-22, 18, 44 * (e.hp / e.maxHp), 6);
-      ctx.restore();
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(s.x, s.y + 14, 18, 7, 0, 0, Math.PI*2); ctx.fill();
+      ctx.save(); ctx.translate(s.x, s.y); if (e.hit > 0) ctx.translate((Math.random()-.5)*4, 0);
+      ctx.fillStyle = e.color; ctx.beginPath(); ctx.arc(0, -10, 18, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#09111d'; ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e.emoji, 0, -10);
+      ctx.fillStyle = 'rgba(0,0,0,0.55)'; drawRoundedRect(-28, -50, 56, 18, 8, 'rgba(0,0,0,0.5)');
+      ctx.fillStyle = '#fff'; ctx.font = '10px Satoshi, sans-serif'; ctx.fillText(e.name, 0, -38);
+      ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(-22, 18, 44, 6); ctx.fillStyle = e.color; ctx.fillRect(-22, 18, 44 * (e.hp / e.maxHp), 6); ctx.restore();
     }
-
-    function drawEnemies() {
-      for (const e of state.enemies) if (e.alive) drawEnemyUnit(e);
-    }
-
+    function drawEnemies() { for (const e of state.enemies) if (e.alive) drawEnemyUnit(e); }
     function drawShards() {
-      for (const srd of state.shards) {
-        if (srd.got) continue;
-        const s = worldToScreen(srd.x, srd.y);
-        const pulse = 1 + Math.sin(Date.now() / 220) * 0.08;
-        ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.fillStyle = 'rgba(0,255,153,0.14)';
-        ctx.beginPath();
-        ctx.arc(0, 0, 24 * pulse, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#00ff99';
-        ctx.beginPath();
-        ctx.moveTo(0, -16);
-        ctx.lineTo(10, 0);
-        ctx.lineTo(0, 16);
-        ctx.lineTo(-10, 0);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
+      for (const srd of state.shards) if (!srd.got) {
+        const s = worldToScreen(srd.x, srd.y), pulse = 1 + Math.sin(Date.now()/180) * 0.12;
+        ctx.save(); ctx.translate(s.x, s.y); ctx.fillStyle = 'rgba(0,255,153,0.18)'; ctx.beginPath(); ctx.arc(0, 0, 26 * pulse, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#00ff99'; ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(11, 0); ctx.lineTo(0, 16); ctx.lineTo(-11, 0); ctx.closePath(); ctx.fill(); ctx.restore();
       }
     }
-
     function drawMaster() {
-      const m = state.master;
-      const s = worldToScreen(m.x, m.y);
-      ctx.fillStyle = 'rgba(0,0,0,.35)';
-      ctx.beginPath();
-      ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(s.x - 13, s.y - 26, 26, 24);
-      ctx.fillStyle = '#fcd34d';
-      ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillRect(s.x - 11, s.y - 46, 22, 8);
-      ctx.fillRect(s.x - 13, s.y - 44, 3, 12);
-      ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(s.x - 6, s.y - 37, 4, 4);
-      ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
-      drawRoundedRect(s.x - 28, s.y - 68, 56, 18, 8, 'rgba(0,0,0,0.56)');
-      ctx.fillStyle = '#00ff99';
-      ctx.font = 'bold 11px Satoshi, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('박사님', s.x, s.y - 55);
+      const m = state.master, s = worldToScreen(m.x, m.y);
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#334155'; ctx.fillRect(s.x - 13, s.y - 26, 26, 24); ctx.fillStyle = '#fcd34d'; ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
+      ctx.fillStyle = '#94a3b8'; ctx.fillRect(s.x - 11, s.y - 46, 22, 8); ctx.fillRect(s.x - 13, s.y - 44, 3, 12); ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(s.x - 6, s.y - 37, 4, 4); ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
+      drawRoundedRect(s.x - 32, s.y - 70, 64, 20, 8, 'rgba(0,0,0,0.56)'); ctx.fillStyle = '#00ff99'; ctx.font = 'bold 11px Satoshi, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('박사님', s.x, s.y - 56);
+      if (distance(state.player, m) < NPC_INTERACT_RANGE) { ctx.strokeStyle = 'rgba(0,255,153,0.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(s.x, s.y - 10, 28, 0, Math.PI*2); ctx.stroke(); }
     }
-
+    function drawMerchant() {
+      const m = state.merchant, s = worldToScreen(m.x, m.y);
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#7c2d12'; ctx.fillRect(s.x - 13, s.y - 26, 26, 24); ctx.fillStyle = '#fde68a'; ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
+      ctx.fillStyle = '#facc15'; ctx.fillRect(s.x - 12, s.y - 46, 24, 8); ctx.fillStyle = '#0f172a'; ctx.fillRect(s.x - 6, s.y - 37, 4, 4); ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
+      drawRoundedRect(s.x - 28, s.y - 68, 56, 18, 8, 'rgba(0,0,0,0.56)'); ctx.fillStyle = '#facc15'; ctx.font = 'bold 11px Satoshi, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('상인', s.x, s.y - 55);
+    }
+    function drawChests() {
+      for (const c of state.chests) {
+        const s = worldToScreen(c.x, c.y);
+        ctx.fillStyle = c.opened ? '#4b5563' : '#8b5a2b';
+        drawRoundedRect(s.x - 18, s.y - 14, 36, 28, 8, c.opened ? '#475569' : '#8b5a2b', 'rgba(255,255,255,0.15)');
+        ctx.fillStyle = c.opened ? '#94a3b8' : '#facc15'; ctx.fillRect(s.x - 4, s.y - 2, 8, 8);
+      }
+    }
+    function drawSigns() {
+      for (const sign of state.signs) {
+        const s = worldToScreen(sign.x, sign.y);
+        ctx.fillStyle = '#8b5e34'; ctx.fillRect(s.x - 3, s.y - 4, 6, 22); drawRoundedRect(s.x - 20, s.y - 26, 40, 20, 6, '#d4a373', 'rgba(0,0,0,0.2)');
+      }
+    }
+    function drawPapers() {
+      for (const paper of state.papers) {
+        const s = worldToScreen(paper.x, paper.y);
+        ctx.fillStyle = paper.read ? '#94a3b8' : '#f8fafc'; drawRoundedRect(s.x - 12, s.y - 14, 24, 28, 4, paper.read ? '#94a3b8' : '#f8fafc', 'rgba(0,0,0,0.2)');
+      }
+    }
+    function drawFountains() {
+      for (const f of state.fountains) {
+        const s = worldToScreen(f.x, f.y), ready = f.cooldown <= 0;
+        ctx.fillStyle = ready ? 'rgba(56,189,248,0.24)' : 'rgba(100,116,139,0.18)'; ctx.beginPath(); ctx.arc(s.x, s.y, 24, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = ready ? '#38bdf8' : '#64748b'; ctx.beginPath(); ctx.arc(s.x, s.y, 10, 0, Math.PI*2); ctx.fill();
+      }
+    }
+    function drawJumpPads() {
+      for (const jp of state.jumpPads) {
+        const s = worldToScreen(jp.x, jp.y);
+        ctx.fillStyle = 'rgba(168,85,247,0.18)'; ctx.beginPath(); ctx.arc(s.x, s.y, 24, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(s.x, s.y, 13, 0, Math.PI*2); ctx.stroke();
+      }
+    }
     function drawAttackArc() {
-      const p = state.player;
-      if (p.attackFlash <= 0) return;
-      const s = worldToScreen(p.x, p.y);
-      const alpha = p.attackFlash;
-      ctx.save();
-      ctx.globalAlpha = alpha * 0.9;
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      if (p.dir === 'up') ctx.arc(s.x, s.y - 8, 34, Math.PI * 1.15, Math.PI * 1.85);
-      if (p.dir === 'down') ctx.arc(s.x, s.y + 12, 34, Math.PI * 0.15, Math.PI * 0.85);
-      if (p.dir === 'left') ctx.arc(s.x - 10, s.y, 34, Math.PI * 0.65, Math.PI * 1.35);
-      if (p.dir === 'right') ctx.arc(s.x + 10, s.y, 34, Math.PI * 1.65, Math.PI * 0.35);
-      ctx.stroke();
-      ctx.restore();
+      const p = state.player; if (p.attackFlash <= 0) return;
+      const s = worldToScreen(p.x, p.y); ctx.save(); ctx.globalAlpha = p.attackFlash * 1.05; ctx.strokeStyle = p.comboStep % 2 === 0 ? '#38bdf8' : '#00ff99'; ctx.lineWidth = 10; ctx.beginPath();
+      if (p.dir === 'up') ctx.arc(s.x, s.y - 8, 42, Math.PI * 1.1, Math.PI * 1.9);
+      if (p.dir === 'down') ctx.arc(s.x, s.y + 12, 42, Math.PI * 0.1, Math.PI * 0.9);
+      if (p.dir === 'left') ctx.arc(s.x - 12, s.y, 42, Math.PI * 0.6, Math.PI * 1.4);
+      if (p.dir === 'right') ctx.arc(s.x + 12, s.y, 42, Math.PI * 1.6, Math.PI * 0.4);
+      ctx.stroke(); ctx.restore();
+    }
+    function drawParticles() {
+      for (const p of state.particles) { const s = worldToScreen(p.x, p.y); ctx.globalAlpha = p.life / p.maxLife; ctx.fillStyle = p.color; ctx.fillRect(s.x, s.y, p.size, p.size); }
+      ctx.globalAlpha = 1;
     }
 
     function updateCamera() {
       state.cam.x = clamp(state.player.x - W / 2, 0, WORLD_W - W);
       state.cam.y = clamp(state.player.y - H / 2, 0, WORLD_H - H);
+      state.cam.zoomPulse = Math.max(0, state.cam.zoomPulse - 0.08);
     }
 
-    function interact() {
+    function interactMasterFirst() {
+      if (distance(state.player, state.master) < NPC_INTERACT_RANGE) {
+        if (!state.shards.every(s => s.got)) setDialog('박사님', '아직 조각이 부족하네. 지도 곳곳을 돌며 모두 회수하게.');
+        else { setDialog('박사님', '좋네. 이제 기술, 만체리, 사업화, 코어가 하나로 정렬됐네.'); showResult(false); }
+        return true;
+      }
+      return false;
+    }
+
+    function interactObjects() {
       const p = state.player;
 
-      for (const shard of state.shards) {
-        if (!shard.got && dist(p, shard) < INTERACT_RANGE) {
-          shard.got = true;
-          p.core += 1;
-          p.gold += 12;
-          setDialog('본질 조각', shard.text);
-          updateHud();
-          return;
+      if (interactMasterFirst()) return true;
+
+      if (distance(p, state.merchant) < NPC_INTERACT_RANGE) {
+        if (!state.merchant.bought && p.gold >= 40) {
+          p.gold -= 40; p.maxHp += 20; p.hp = Math.min(p.maxHp, p.hp + 20); state.merchant.bought = true;
+          setDialog('상인', '좋은 거래요. 체력 상한을 올려 드렸습니다. 앞으로 더 오래 버틸 수 있어요.'); updateHud();
+        } else if (!state.merchant.bought) {
+          setDialog('상인', '40 Gold면 체력 상한을 올려 드립니다. 아직 돈이 조금 부족하군요.');
+        } else {
+          setDialog('상인', '이미 강화는 끝났습니다. 이제 구조를 완성하러 가세요.');
         }
+        return true;
       }
 
-      if (dist(p, state.master) < INTERACT_RANGE) {
-        const allGot = state.shards.every(s => s.got);
-        if (!allGot) {
-          setDialog('박사님', '조각이 아직 부족하네. 필드를 돌며 본질 조각 4개를 모두 회수하게.');
-        } else {
-          setDialog('박사님', '좋네. 기술, 만체리, 사업화, 코어가 하나로 정렬됐네. 이제 결과를 보게.');
-          showResult();
-        }
+      for (const shard of state.shards) if (!shard.got && distance(p, shard) < INTERACT_RANGE) {
+        shard.got = true; p.core += 1; p.gold += 20; p.combo += 1; p.comboTimer = 2.4; particle(shard.x, shard.y, '#00ff99', 18, 160); state.cam.zoomPulse = 1;
+        setDialog('본질 조각', shard.text); updateHud(); return true;
       }
+
+      for (const chest of state.chests) if (!chest.opened && distance(p, chest) < INTERACT_RANGE) {
+        chest.opened = true;
+        if (chest.reward === 'gold') { p.gold += chest.amount; setDialog('상자', `상자를 열었습니다. Gold +${chest.amount}`); }
+        else if (chest.reward === 'heal') { p.hp = Math.min(p.maxHp, p.hp + chest.amount); setDialog('상자', `회복 보급품을 발견했습니다. HP +${chest.amount}`); }
+        else if (chest.reward === 'dash') { p.dashCooldown = Math.max(0, p.dashCooldown - 0.3); setDialog('상자', '대시 모듈을 얻었습니다. 당분간 대시 회복이 더 빨라집니다.'); }
+        particle(chest.x, chest.y, '#facc15', 14, 130); updateHud(); return true;
+      }
+
+      for (const sign of state.signs) if (distance(p, sign) < INTERACT_RANGE) { setDialog('표지판', sign.text); return true; }
+      for (const paper of state.papers) if (distance(p, paper) < INTERACT_RANGE) { paper.read = true; setDialog('문서', paper.text); return true; }
+
+      for (const f of state.fountains) if (distance(p, f) < INTERACT_RANGE) {
+        if (f.cooldown <= 0) {
+          p.hp = p.maxHp; f.cooldown = 10; particle(f.x, f.y, '#38bdf8', 18, 150); setDialog('회복의 샘', '맑은 물이 흐릅니다. HP가 모두 회복되었습니다.'); updateHud();
+        } else {
+          setDialog('회복의 샘', `샘이 다시 차오르는 중입니다. ${Math.ceil(f.cooldown)}초 뒤에 사용할 수 있습니다.`);
+        }
+        return true;
+      }
+
+      for (const jp of state.jumpPads) if (distance(p, jp) < INTERACT_RANGE) {
+        p.x = jp.tx; p.y = jp.ty; particle(p.x, p.y, '#a855f7', 18, 180); state.cam.zoomPulse = 1.2; setDialog('점프 패드', '빠르게 이동했습니다. 탐험 동선이 훨씬 짧아집니다.'); return true;
+      }
+
+      return false;
     }
 
     function attack() {
       const p = state.player;
       if (p.attackCooldown > 0) return;
-      p.attackCooldown = 0.38;
-      p.attackFlash = 0.32;
-      let hit = false;
+      p.attackCooldown = 0.16; p.attackFlash = 0.28; p.comboStep += 1;
+      let hitSomething = false, killsThisSwing = 0;
 
       for (const e of state.enemies) {
         if (!e.alive) continue;
-        const dx = e.x - p.x;
-        const dy = e.y - p.y;
+        const dx = e.x - p.x, dy = e.y - p.y;
         const near = Math.hypot(dx, dy) < ATTACK_RANGE;
         const facing =
-          (p.dir === 'up' && dy < 0 && Math.abs(dx) < 54) ||
-          (p.dir === 'down' && dy > 0 && Math.abs(dx) < 54) ||
-          (p.dir === 'left' && dx < 0 && Math.abs(dy) < 54) ||
-          (p.dir === 'right' && dx > 0 && Math.abs(dy) < 54);
-
+          (p.dir === 'up' && dy < 18 && dy > -ATTACK_RANGE && Math.abs(dx) < 64) ||
+          (p.dir === 'down' && dy > -18 && dy < ATTACK_RANGE && Math.abs(dx) < 64) ||
+          (p.dir === 'left' && dx < 18 && dx > -ATTACK_RANGE && Math.abs(dy) < 64) ||
+          (p.dir === 'right' && dx > -18 && dx < ATTACK_RANGE && Math.abs(dy) < 64);
         if (near && facing) {
-          hit = true;
-          e.hp -= 16;
-          e.hit = 0.22;
-          state.shake = 1;
-          if (e.hp <= 0) {
-            e.alive = false;
-            state.player.gold += 18;
-            state.kills += 1;
-            setDialog('시스템', `${enemyConf[e.type].name}을(를) 돌파했습니다. Gold +18`);
-          } else {
-            setDialog('적 분석', enemyConf[e.type].line);
-          }
+          hitSomething = true; const dmg = 14 + (p.combo > 5 ? 4 : 0); e.hp -= dmg; e.hit = 0.24;
+          const d = Math.hypot(dx, dy) || 1; e.knockX = dx / d * 240; e.knockY = dy / d * 240; particle(e.x, e.y, e.color, 8, 120); state.shake = 1.2; state.cam.zoomPulse = .7;
+          if (e.hp <= 0) { e.alive = false; killsThisSwing += 1; p.gold += 14 + p.combo; p.combo += 1; p.comboTimer = 2.6; state.kills += 1; particle(e.x, e.y, e.color, 18, 180); }
         }
       }
 
-      if (!hit) interact();
+      if (killsThisSwing > 0) setDialog('시스템', `${killsThisSwing}체 돌파! 콤보가 이어집니다. Gold도 빠르게 쌓입니다.`);
+      else if (hitSomething) setDialog('적 타격', '좋아. 리듬 좋게 밀어붙이고 있습니다.');
+      else if (!interactObjects()) setDialog('시스템', '주변에 바로 반응할 대상이 없습니다. 오브젝트 가까이 붙어 Z를 눌러보세요.');
       updateHud();
+    }
+
+    function dash() {
+      const p = state.player; if (p.dashCooldown > 0 || p.dashTime > 0) return;
+      p.dashTime = 0.18; p.dashCooldown = 0.7; p.invincible = 0.22; state.cam.zoomPulse = 1.2; particle(p.x, p.y, '#38bdf8', 10, 140);
+      setDialog('시스템', '대시! 장애물 사이를 빠르게 파고들 수 있습니다.');
     }
 
     function enemyLogic(dt) {
@@ -826,61 +598,70 @@
       for (const e of state.enemies) {
         if (!e.alive) continue;
         if (e.hit > 0) e.hit -= dt;
-        const d = dist(p, e);
-        if (d < 180) {
-          const vx = (p.x - e.x) / d;
-          const vy = (p.y - e.y) / d;
-          const nx = e.x + vx * e.speed * dt;
-          const ny = e.y + vy * e.speed * dt;
+        if (Math.abs(e.knockX) > 1 || Math.abs(e.knockY) > 1) {
+          const nx = e.x + e.knockX * dt, ny = e.y + e.knockY * dt;
           const box = { x: nx - 16, y: ny - 12, w: 32, h: 24 };
-          let blocked = false;
-          for (const o of obstacles) if (rectsOverlap(box, o)) blocked = true;
+          let blocked = false; for (const o of obstacles) if (rectsOverlap(box, o)) blocked = true;
+          if (!blocked) { e.x = nx; e.y = ny; } e.knockX *= 0.78; e.knockY *= 0.78; continue;
+        }
+        const d = distance(p, e);
+        if (d < 240) {
+          const vx = (p.x - e.x) / d, vy = (p.y - e.y) / d;
+          const nx = e.x + vx * e.speed * dt, ny = e.y + vy * e.speed * dt;
+          const box = { x: nx - 16, y: ny - 12, w: 32, h: 24 };
+          let blocked = false; for (const o of obstacles) if (rectsOverlap(box, o)) blocked = true;
           if (!blocked) { e.x = nx; e.y = ny; }
         }
         if (d < 34 && p.invincible <= 0) {
-          p.hp -= 10;
-          p.invincible = 1;
-          state.shake = 1.4;
-          setDialog('적 습격', `${enemyConf[e.type].name}에게 피해를 입었습니다. HP -10`);
-          if (p.hp <= 0) {
-            p.hp = 0;
-            showResult(true);
-          }
+          p.hp -= e.atk; p.invincible = 0.8; p.combo = 0; p.comboTimer = 0; state.shake = 1.8; particle(p.x, p.y, '#f87171', 14, 170);
+          setDialog('적 습격', `${e.name}에게 ${e.atk} 피해를 입었습니다. HP를 관리하며 탐험하세요.`);
+          if (p.hp <= 0) { p.hp = 0; showResult(true); }
           updateHud();
         }
       }
+      if (state.enemies.filter(e => e.alive).length <= 2) spawnWave();
+    }
+    function spawnWave() {
+      const spots = [[220,320],[480,850],[920,580],[1300,360],[1760,760],[1580,1240],[720,1260],[1990,980]];
+      for (let i = 0; i < 3; i++) { const [x,y] = spots[Math.floor(Math.random()*spots.length)]; state.enemies.push(makeEnemy(x + Math.random()*40, y + Math.random()*40)); }
+      setDialog('시스템', '새 적이 유입되었습니다. 탐험 루프를 계속 이어가세요.');
     }
 
     function movePlayer(dt) {
-      const p = state.player;
-      let mx = 0, my = 0;
+      const p = state.player; let mx = 0, my = 0;
       if (Input.keys['ArrowLeft']) { mx -= 1; p.dir = 'left'; }
       if (Input.keys['ArrowRight']) { mx += 1; p.dir = 'right'; }
       if (Input.keys['ArrowUp']) { my -= 1; p.dir = 'up'; }
       if (Input.keys['ArrowDown']) { my += 1; p.dir = 'down'; }
-
       if (mx !== 0 || my !== 0) {
-        const len = Math.hypot(mx, my) || 1;
-        mx /= len; my /= len;
-        const nx = p.x + mx * p.speed * dt;
-        const ny = p.y + my * p.speed * dt;
-        if (canMoveTo(nx, p.y)) p.x = nx;
-        if (canMoveTo(p.x, ny)) p.y = ny;
-        p.stepTimer += dt;
-        if (p.stepTimer > 0.12) {
-          p.step += 1;
-          p.stepTimer = 0;
-        }
+        const len = Math.hypot(mx, my) || 1; mx /= len; my /= len;
+        const currentSpeed = p.dashTime > 0 ? 720 : p.speed;
+        const nx = p.x + mx * currentSpeed * dt, ny = p.y + my * currentSpeed * dt;
+        if (canMoveTo(nx, p.y)) p.x = nx; if (canMoveTo(p.x, ny)) p.y = ny;
+        if (p.dashTime > 0) p.trail.push({ x: p.x, y: p.y, life: 0.18, maxLife: 0.18 });
       }
+    }
+
+    function updateParticles(dt) {
+      for (const p of state.particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.95; p.vy *= 0.95; p.life -= dt; }
+      state.particles = state.particles.filter(p => p.life > 0);
+      for (const t of state.player.trail) t.life -= dt;
+      state.player.trail = state.player.trail.filter(t => t.life > 0);
+    }
+
+    function updateObjects(dt) {
+      for (const f of state.fountains) if (f.cooldown > 0) f.cooldown -= dt;
     }
 
     function showResult(fail = false) {
       if (state.resultShown) return;
-      state.resultShown = true;
-      state.phase = 'end';
+      state.resultShown = true; state.phase = 'end';
+      const p = state.player;
+      const opened = state.chests.filter(c => c.opened).length;
+      const docs = state.papers.filter(p => p.read).length;
       const text = fail
-        ? `전투 중 체력이 모두 소진되었습니다. 그래도 본질 조각 ${state.player.core}개와 적 처치 ${state.kills}회 기록은 남았습니다. 숫자만 좇지 말고, 되는 구조부터 다시 설계해보세요.`
-        : `본질 조각 ${state.player.core}개를 모두 모으고 적 ${state.kills}체를 돌파했습니다. 기술, 만체리, 사업화, 코어가 연결되며 구조가 완성되었습니다. 최종 Gold는 ${state.player.gold}입니다.`;
+        ? `체력이 모두 소진되었습니다. 그래도 조각 ${p.core}개, 적 처치 ${state.kills}회, 상자 ${opened}개, 문서 ${docs}개를 회수했습니다. 이번엔 더 많은 환경 상호작용을 시도해 보세요.`
+        : `본질 조각 ${p.core}개를 모두 모으고 박사님과 대화를 완료했습니다. 적 처치 ${state.kills}회, 상자 ${opened}개 개봉, 문서 ${docs}개 열람, 최종 골드 ${p.gold}. 이번 버전은 전투뿐 아니라 환경 상호작용까지 확장된 구조입니다.`;
       document.getElementById('result-text').textContent = text;
       document.getElementById('result-screen').style.display = 'flex';
     }
@@ -889,39 +670,31 @@
       if (state.phase !== 'play') return;
       const p = state.player;
       if (p.attackCooldown > 0) p.attackCooldown -= dt;
-      if (p.attackFlash > 0) p.attackFlash -= dt;
+      if (p.attackFlash > 0) p.attackFlash -= dt * 1.7;
+      if (p.dashCooldown > 0) p.dashCooldown -= dt;
+      if (p.dashTime > 0) p.dashTime -= dt;
       if (p.invincible > 0) p.invincible -= dt;
-      if (state.messageTimer > 0) state.messageTimer -= dt;
-
-      movePlayer(dt);
-      enemyLogic(dt);
-
+      if (p.comboTimer > 0) p.comboTimer -= dt; else p.combo = 0;
+      movePlayer(dt); enemyLogic(dt); updateParticles(dt); updateObjects(dt);
       if (Input.justPressed['KeyZ'] || Input.justPressed['Space']) attack();
+      if (Input.justPressed['KeyX']) dash();
       Input.justPressed = {};
-      updateCamera();
+      updateCamera(); updateHud();
     }
 
     function loop(now) {
-      const dt = Math.min((now - lastTime) / 1000, 0.05);
-      lastTime = now;
-      update(dt);
-      drawWorld();
-      requestAnimationFrame(loop);
+      const dt = Math.min((now - lastTime) / 1000, 0.05); lastTime = now; update(dt); drawWorld(); requestAnimationFrame(loop);
     }
 
     let lastTime = 0;
     document.getElementById('start-btn').addEventListener('click', () => {
       document.getElementById('start-screen').style.display = 'none';
-      state.phase = 'play';
-      updateHud();
-      updateCamera();
-      setDialog('박사님', '이제 직접 움직여 보게. 방향키로 탐험하고, Z 키로 상호작용과 공격을 하게.');
-      lastTime = performance.now();
-      requestAnimationFrame(loop);
+      state.phase = 'play'; spawnInitialEnemies(); updateHud(); updateCamera();
+      setDialog('박사님', '이번엔 환경 자체를 더 많이 만져보게. 그리고 이제 내 근처에서 Z를 누르면 바로 대화가 될 걸세.');
+      lastTime = performance.now(); requestAnimationFrame(loop);
     });
 
-    updateHud();
-    drawWorld();
+    updateHud(); drawWorld();
   </script>
 </body>
 </html>
