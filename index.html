@@ -2,18 +2,21 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>본질센스 리듬 액션 (DJMAX 스타일)</title>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>본질센스 액션 RPG</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #0a0a0f;
+      background:
+        radial-gradient(circle at top, rgba(0,255,153,0.08), transparent 28%),
+        radial-gradient(circle at right, rgba(56,189,248,0.08), transparent 24%),
+        #06070b;
       font-family: 'Satoshi', sans-serif;
+      color: #f8fafc;
       touch-action: none;
     }
     body {
@@ -21,15 +24,20 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      padding: 12px;
+      gap: 12px;
     }
     #wrap {
       position: relative;
-      width: min(600px, 100vw);
-      height: min(600px, 100vw);
+      width: min(760px, 100vw);
+      height: min(760px, calc(100vw + 40px));
+      max-height: calc(100dvh - 150px);
       background: #000;
-      box-shadow: 0 0 50px rgba(0,255,153,0.15);
-      flex-shrink: 0;
+      border-radius: 24px;
       overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
     }
     canvas {
       display: block;
@@ -37,543 +45,883 @@
       height: 100%;
       image-rendering: pixelated;
     }
-
     #ui {
       position: absolute;
       inset: 0;
       pointer-events: none;
       z-index: 3;
     }
-    #revenue {
+    .top-hud {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      font-size: clamp(18px, 4vw, 26px);
+      inset: 14px 14px auto 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .brand-box, .stat-box, #dialog-box, #quest-box {
+      backdrop-filter: blur(10px);
+      background: rgba(7, 10, 15, 0.78);
+      border: 1px solid rgba(148,163,184,0.12);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.28);
+    }
+    .brand-box {
+      padding: 12px 14px;
+      border-radius: 16px;
+      min-width: 240px;
+    }
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
       font-weight: 700;
       color: #00ff99;
-      text-shadow: 0 0 12px rgba(0,255,153,0.45);
+      background: rgba(0,255,153,0.08);
+      border: 1px solid rgba(0,255,153,0.18);
+      margin-bottom: 8px;
+      letter-spacing: .05em;
+    }
+    .brand-title {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 5px;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 360px;
+    }
+    .stat-box {
+      min-width: 102px;
+      padding: 11px 12px;
+      border-radius: 16px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
+
+    #quest-box {
+      position: absolute;
+      right: 14px;
+      top: 118px;
+      width: min(250px, 42vw);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+    #quest-title {
+      color: #00ff99;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    #quest-text {
+      font-size: 12px;
+      color: #dbe4ee;
+      line-height: 1.65;
+    }
+
     #dialog-box {
       position: absolute;
       left: 14px;
       right: 14px;
       bottom: 14px;
-      padding: 12px 14px;
-      background: rgba(10,15,25,0.93);
-      border: 2px solid #00ff99;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      padding: 14px 16px;
+      border-radius: 18px;
     }
     #dialog-speaker {
       font-size: 12px;
       font-weight: 700;
       color: #00ff99;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
       text-transform: uppercase;
+      letter-spacing: .05em;
     }
     #dialog-text {
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.7;
       color: #f8fafc;
     }
 
-    #start-screen {
+    #start-screen, #result-screen {
       position: absolute;
       inset: 0;
       z-index: 10;
-      background: rgba(5,10,15,0.97);
+      background: rgba(4, 7, 13, 0.88);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 16px;
-      pointer-events: auto;
+      padding: 24px;
+      text-align: center;
     }
-    #start-screen h1 {
-      font-size: clamp(22px, 5vw, 30px);
+    #result-screen { display: none; }
+    .overlay-card {
+      width: min(640px, 100%);
+      padding: 24px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(0,255,153,0.05), transparent 28%),
+        rgba(10, 14, 24, 0.95);
+      border: 1px solid rgba(148,163,184,0.1);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+    .overlay-chip {
+      display: inline-flex;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(0,255,153,0.08);
+      border: 1px solid rgba(0,255,153,0.16);
       color: #00ff99;
-      text-align: center;
-      line-height: 1.3;
-    }
-    #start-screen p {
-      color: #64748b;
-      font-size: 13px;
-      line-height: 1.7;
-      text-align: center;
-      max-width: 440px;
-      padding: 0 16px;
-    }
-    #start-btn {
-      border: none;
-      border-radius: 8px;
-      background: #00ff99;
-      color: #07110d;
-      padding: 13px 34px;
-      font-size: 16px;
+      font-size: 12px;
       font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .overlay-card h1 {
+      font-size: clamp(30px, 6vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 12px;
+    }
+    .overlay-card p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .feature {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(148,163,184,0.08);
+    }
+    .feature b {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .feature span {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.65;
+    }
+    .start-btn {
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(90deg, #00ff99, #38bdf8);
+      color: #02110d;
+      padding: 15px 30px;
+      font-size: 17px;
+      font-weight: 800;
       cursor: pointer;
-      pointer-events: auto;
+      min-width: 220px;
     }
 
-    /* 모바일용 터치 컨트롤을 리듬 입력용 버튼으로 재활용 */
     #touch-controls {
-      width: min(600px, 100vw);
+      width: min(760px, 100vw);
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       gap: 14px;
-      padding: 10px 18px 14px;
-      background: #0a0a0f;
+      padding: 0 6px;
       flex-shrink: 0;
     }
-    .lane-btn {
-      flex: 1;
-      max-width: 110px;
-      height: 70px;
-      border-radius: 12px;
-      border: 2px solid rgba(0,255,153,0.35);
-      background: rgba(0,255,153,0.08);
-      color: #e5e7eb;
+    #dpad {
+      position: relative;
+      width: 156px;
+      height: 156px;
+      flex-shrink: 0;
+    }
+    .dpad-btn {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,255,153,0.26);
+      background: rgba(0,255,153,0.12);
+      color: #00ff99;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
-      font-size: 13px;
+      font-size: 20px;
       font-weight: 700;
       user-select: none;
       -webkit-user-select: none;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
     }
-    .lane-btn span.key {
-      font-size: 18px;
-      color: #00ff99;
+    #btn-up { top: 0; left: 53px; }
+    #btn-down { bottom: 0; left: 53px; }
+    #btn-left { left: 0; top: 53px; }
+    #btn-right { right: 0; top: 53px; }
+    #btn-center {
+      position: absolute;
+      top: 53px;
+      left: 53px;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.05);
     }
-    .lane-btn:active {
-      background: rgba(0,255,153,0.3);
+    .action-cluster {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .action-btn {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 2px solid rgba(56,189,248,0.35);
+      background: rgba(56,189,248,0.14);
+      color: #e0f2fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      text-align: center;
+      padding: 8px;
+    }
+    .dpad-btn:active, .action-btn:active {
+      transform: translateY(1px);
+      background: rgba(0,255,153,0.26);
     }
 
-    @media (max-width: 600px) {
-      #dialog-box { bottom: 10px; left: 10px; right: 10px; }
-      #dialog-text { font-size: 12px; }
-      #touch-controls { padding: 8px 12px 12px; }
+    @media (max-width: 720px) {
+      body { padding: 8px; }
+      #wrap { border-radius: 18px; max-height: calc(100dvh - 210px); }
+      .top-hud { flex-direction: column; }
+      .stats { justify-content: flex-start; max-width: none; }
+      #quest-box {
+        top: auto;
+        right: 14px;
+        bottom: 112px;
+        left: auto;
+        width: min(220px, 48vw);
+      }
+      .features { grid-template-columns: 1fr; }
+      #touch-controls { gap: 8px; }
+      .action-btn { width: 82px; height: 82px; }
+      #dpad { width: 138px; height: 138px; }
+      .dpad-btn { width: 44px; height: 44px; }
+      #btn-up { left: 47px; }
+      #btn-down { left: 47px; }
+      #btn-left { top: 47px; }
+      #btn-right { top: 47px; }
+      #btn-center { top: 47px; left: 47px; width: 44px; height: 44px; }
+      #dialog-text { font-size: 13px; }
     }
   </style>
 </head>
 <body>
   <div id="wrap">
-    <canvas id="c" width="600" height="600"></canvas>
+    <canvas id="c" width="760" height="760"></canvas>
 
     <div id="ui">
-      <div id="revenue">SCORE: 0 (0x)</div>
+      <div class="top-hud">
+        <div class="brand-box">
+          <div class="brand-chip">◆ BONJIL SENSE ACTION RPG</div>
+          <div class="brand-title">본질센스 액션 RPG</div>
+          <div class="brand-sub">직접 캐릭터를 움직이며 탐색하고, 적과 싸우고, 본질 조각을 수집하세요.</div>
+        </div>
+        <div class="stats">
+          <div class="stat-box"><div class="stat-label">HP</div><div class="stat-value" id="hp-ui">100 / 100</div></div>
+          <div class="stat-box"><div class="stat-label">Gold</div><div class="stat-value" id="gold-ui">0</div></div>
+          <div class="stat-box"><div class="stat-label">Core</div><div class="stat-value" id="core-ui">0 / 4</div></div>
+        </div>
+      </div>
+
+      <div id="quest-box">
+        <div id="quest-title">현재 목표</div>
+        <div id="quest-text">필드 곳곳의 본질 조각 4개를 모으고, 중앙의 박사님에게 돌아가세요.</div>
+      </div>
+
       <div id="dialog-box">
         <div id="dialog-speaker">시스템 알림</div>
-        <div id="dialog-text">
-          D / F / J / K 키 또는 아래 버튼을 박자에 맞춰 눌러보세요.
-        </div>
+        <div id="dialog-text">방향키 또는 아래 조작 버튼으로 이동하고, Z / 공격 버튼으로 액션하세요.</div>
       </div>
     </div>
 
     <div id="start-screen">
-      <h1>본질센스 리듬 액션<br>DJMAX 스타일 4키</h1>
-      <p>
-        기술 → 본질(만체리) → 사업화·고수익화 → 코어를<br>
-        리듬에 맞춰 입력하며 체득하는 4키 리듬 액션 모드입니다.<br>
-        D / F / J / K 키로 플레이합니다.
-      </p>
-      <button id="start-btn">▶ 시스템 가동</button>
+      <div class="overlay-card">
+        <div class="overlay-chip">실제 조작형 버전</div>
+        <h1>캐릭터를 직접 움직이는<br>액션 RPG로 바꿨습니다.</h1>
+        <p>
+          키보드 방향키로 이동하고, Z 키로 공격 및 상호작용을 합니다.
+          필드를 탐험하며 적을 쓰러뜨리고, 본질 조각을 모아 마지막 대화를 완료하면 클리어입니다.
+        </p>
+        <div class="features">
+          <div class="feature"><b>직접 이동</b><span>위·아래·좌·우로 실제 게임처럼 탐험합니다.</span></div>
+          <div class="feature"><b>간단 전투</b><span>근접 공격 한 가지로 쉽게 이해되는 구조입니다.</span></div>
+          <div class="feature"><b>모바일 지원</b><span>하단 가상패드와 액션 버튼으로도 플레이됩니다.</span></div>
+        </div>
+        <button class="start-btn" id="start-btn">▶ 탐험 시작</button>
+      </div>
+    </div>
+
+    <div id="result-screen">
+      <div class="overlay-card">
+        <div class="overlay-chip">MISSION CLEAR</div>
+        <h1>본질 구조를 회수했습니다.</h1>
+        <p id="result-text">수집한 조각과 전투 기록을 바탕으로 결과가 표시됩니다.</p>
+        <button class="start-btn" onclick="location.reload()">다시 플레이</button>
+      </div>
     </div>
   </div>
 
   <div id="touch-controls">
-    <div class="lane-btn" data-lane="0">
-      <span class="key">D</span>
-      <span>기술</span>
+    <div id="dpad">
+      <div class="dpad-btn" id="btn-up">▲</div>
+      <div class="dpad-btn" id="btn-down">▼</div>
+      <div class="dpad-btn" id="btn-left">◀</div>
+      <div class="dpad-btn" id="btn-right">▶</div>
+      <div id="btn-center"></div>
     </div>
-    <div class="lane-btn" data-lane="1">
-      <span class="key">F</span>
-      <span>만체리</span>
-    </div>
-    <div class="lane-btn" data-lane="2">
-      <span class="key">J</span>
-      <span>사업화</span>
-    </div>
-    <div class="lane-btn" data-lane="3">
-      <span class="key">K</span>
-      <span>코어</span>
+    <div class="action-cluster">
+      <div class="action-btn" id="btn-attack">
+        <span style="font-size:22px;">⚔️</span>
+        <span>공격 / 상호작용</span>
+      </div>
     </div>
   </div>
 
   <script>
-    const W = 600, H = 600;
-
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    // 리듬게임 상태
+    const W = canvas.width;
+    const H = canvas.height;
+    const WORLD_W = 1600;
+    const WORLD_H = 1200;
+    const TILE = 80;
+    const SPEED = 220;
+    const PLAYER_SIZE = 26;
+    const ATTACK_RANGE = 66;
+    const INTERACT_RANGE = 70;
+
+    const Input = { keys: {}, justPressed: {} };
+
     const state = {
       phase: 'start',
-      score: 0,
-      combo: 0,
-      maxCombo: 0,
-      judgeText: '',
-      judgeTimer: 0,
-      accuracySamples: [],
-      time: 0,
-      songLength: 35,     // 대략 35초짜리 곡 가정
-      bpm: 130,
-      laneX: [90, 210, 330, 450],
-      laneWidth: 80,
-      judgeY: 500,
-      noteSpeed: 280,     // 판정선까지 내려오는 속도(px/s)
-      appearTime: 2.0,    // 판정선 도달 2초 전에 위에서 등장
-      notes: [],
-      keys: {},
+      player: {
+        x: 200,
+        y: 860,
+        w: PLAYER_SIZE,
+        h: PLAYER_SIZE,
+        speed: SPEED,
+        dir: 'down',
+        hp: 100,
+        maxHp: 100,
+        gold: 0,
+        core: 0,
+        attackCooldown: 0,
+        invincible: 0,
+        attackFlash: 0,
+        step: 0,
+        stepTimer: 0
+      },
+      cam: { x: 0, y: 0 },
+      messageTimer: 0,
+      shake: 0,
+      kills: 0,
+      master: { x: 790, y: 170, talked: false },
+      shards: [
+        { x: 290, y: 290, got: false, text: '기술은 시작점일 뿐, 구조를 대신하지 못한다.' },
+        { x: 1280, y: 260, got: false, text: '만체리는 잠재 트래픽과 노출 가능성을 함께 본다.' },
+        { x: 1320, y: 920, got: false, text: '사업화는 다회성 트래픽과 전환 구조를 세우는 일이다.' },
+        { x: 400, y: 980, got: false, text: '코어는 내가 좋아하며 실제로 오래 되는 사업이다.' }
+      ],
+      enemies: [
+        { x: 520, y: 560, hp: 34, maxHp: 34, type: 'past', speed: 65, alive: true, hit: 0 },
+        { x: 1140, y: 450, hp: 42, maxHp: 42, type: 'bench', speed: 72, alive: true, hit: 0 },
+        { x: 1160, y: 880, hp: 55, maxHp: 55, type: 'labor', speed: 78, alive: true, hit: 0 },
+        { x: 650, y: 980, hp: 48, maxHp: 48, type: 'crowd', speed: 80, alive: true, hit: 0 }
+      ],
+      resultShown: false
     };
 
-    // 간단한 패턴 (타이밍 / 레인)
-    // 실제로는 BPM 기반으로 막 늘리면 됨
-    const chart = [];
-    (function makeChart() {
-      // 4마디 정도 반복 패턴
-      const beat = 60 / state.bpm; // 한 박자 길이
-      let t = 2;                   // 2초 후부터 시작
-      const pattern = [
-        0,1,2,3,
-        0,1,2,3,
-        0,2,1,3,
-        0,3,1,2
-      ];
-      // 16비트 간격으로 4마디 정도 생성
-      for (let m = 0; m < 8; m++) {
-        for (let i = 0; i < pattern.length; i++) {
-          chart.push({ time: t, lane: pattern[i] });
-          t += beat / 2; // 8비트
-        }
-        t += beat; // 중간에 쉬는 간격
-      }
-    })();
+    const enemyConf = {
+      past:  { emoji: '📼', name: '과거 이슈', color: '#94a3b8', line: '이미 식은 키워드에 매달리고 있다.' },
+      bench: { emoji: '🪞', name: '겉핥기 벤치', color: '#a855f7', line: '겉모습만 따라 한 구조는 오래 못 간다.' },
+      labor: { emoji: '⛓️', name: '노동형 구조', color: '#fb923c', line: '시간은 쓰지만 남는 것은 적다.' },
+      crowd: { emoji: '🔥', name: '포화 경쟁', color: '#f87171', line: '수요는 많지만 경쟁도 너무 높다.' }
+    };
 
-    function setDialog(speaker, txt) {
+    const obstacles = [
+      { x: 120, y: 120, w: 240, h: 120 },
+      { x: 620, y: 90, w: 360, h: 140 },
+      { x: 1160, y: 130, w: 220, h: 150 },
+      { x: 180, y: 520, w: 180, h: 220 },
+      { x: 760, y: 470, w: 240, h: 180 },
+      { x: 1240, y: 620, w: 220, h: 170 },
+      { x: 280, y: 1040, w: 320, h: 90 },
+      { x: 820, y: 920, w: 260, h: 120 }
+    ];
+
+    function setDialog(speaker, text) {
       const sp = document.getElementById('dialog-speaker');
       sp.textContent = speaker;
       sp.style.color =
-        speaker.includes('기술') ? '#38bdf8' :
-        speaker.includes('만체리') ? '#a855f7' :
-        speaker.includes('사업화') ? '#f97316' :
-        speaker.includes('코어') ? '#22c55e' :
-        '#00ff99';
-      document.getElementById('dialog-text').textContent = txt;
+        speaker === '박사님' ? '#00ff99' :
+        speaker.includes('적') ? '#fb923c' :
+        speaker.includes('시스템') ? '#38bdf8' : '#00ff99';
+      document.getElementById('dialog-text').textContent = text;
+      state.messageTimer = 3.5;
     }
 
-    function updateScoreUI() {
-      const acc =
-        state.accuracySamples.length
-          ? (state.accuracySamples.reduce((a,b)=>a+b,0) / state.accuracySamples.length)
-          : 100;
-      document.getElementById('revenue').textContent =
-        `SCORE: ${Math.floor(state.score).toLocaleString()} (${state.combo}x, ${acc.toFixed(1)}%)`;
+    function updateHud() {
+      document.getElementById('hp-ui').textContent = `${Math.max(0, state.player.hp)} / ${state.player.maxHp}`;
+      document.getElementById('gold-ui').textContent = state.player.gold;
+      document.getElementById('core-ui').textContent = `${state.player.core} / ${state.shards.length}`;
+
+      const allGot = state.shards.every(s => s.got);
+      document.getElementById('quest-text').textContent = allGot
+        ? '모든 본질 조각을 모았습니다. 중앙 상단의 박사님에게 돌아가 결과를 완성하세요.'
+        : `필드 곳곳의 본질 조각 ${state.shards.length}개 중 ${state.player.core}개를 모으고, 적을 피하거나 쓰러뜨리며 탐험하세요.`;
     }
 
-    // 노트가 실제로 내려오기 시작하는 시점에 notes로 옮김
-    function spawnNotesIfNeeded() {
-      for (const n of chart) {
-        if (n.spawned) continue;
-        if (state.time >= n.time - state.appearTime) {
-          state.notes.push({
-            time: n.time,
-            lane: n.lane,
-            hit: false,
-            judged: false
-          });
-          n.spawned = true;
+    function bindHoldButton(id, code) {
+      const el = document.getElementById(id);
+      const on = e => { e.preventDefault(); Input.keys[code] = true; };
+      const off = e => { e.preventDefault(); Input.keys[code] = false; };
+      el.addEventListener('touchstart', on, { passive: false });
+      el.addEventListener('touchend', off, { passive: false });
+      el.addEventListener('touchcancel', off, { passive: false });
+      el.addEventListener('mousedown', on);
+      el.addEventListener('mouseup', off);
+      el.addEventListener('mouseleave', off);
+    }
+
+    bindHoldButton('btn-up', 'ArrowUp');
+    bindHoldButton('btn-down', 'ArrowDown');
+    bindHoldButton('btn-left', 'ArrowLeft');
+    bindHoldButton('btn-right', 'ArrowRight');
+
+    const attackBtn = document.getElementById('btn-attack');
+    const attackPress = e => { e.preventDefault(); Input.justPressed['KeyZ'] = true; };
+    attackBtn.addEventListener('touchstart', attackPress, { passive: false });
+    attackBtn.addEventListener('mousedown', attackPress);
+
+    document.addEventListener('keydown', e => {
+      if (!Input.keys[e.code]) Input.justPressed[e.code] = true;
+      Input.keys[e.code] = true;
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','KeyZ','Space'].includes(e.code)) e.preventDefault();
+    });
+    document.addEventListener('keyup', e => Input.keys[e.code] = false);
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+
+    function rectsOverlap(a, b) {
+      return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+    }
+
+    function canMoveTo(nx, ny) {
+      const box = { x: nx - 14, y: ny - 10, w: 28, h: 20 };
+      if (box.x < 0 || box.y < 0 || box.x + box.w > WORLD_W || box.y + box.h > WORLD_H) return false;
+      for (const o of obstacles) if (rectsOverlap(box, o)) return false;
+      return true;
+    }
+
+    function drawRoundedRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+    }
+
+    function worldToScreen(x, y) {
+      return { x: x - state.cam.x, y: y - state.cam.y };
+    }
+
+    function drawWorld() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      if (state.shake > 0) {
+        ctx.translate((Math.random() - .5) * state.shake * 5, (Math.random() - .5) * state.shake * 5);
+        state.shake = Math.max(0, state.shake - 0.12);
+      }
+
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#0b1220');
+      grad.addColorStop(.55, '#0e1726');
+      grad.addColorStop(1, '#081018');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      for (let y = 0; y < WORLD_H; y += TILE) {
+        for (let x = 0; x < WORLD_W; x += TILE) {
+          const s = worldToScreen(x, y);
+          if (s.x > W || s.y > H || s.x + TILE < 0 || s.y + TILE < 0) continue;
+          const checker = ((x / TILE) + (y / TILE)) % 2;
+          ctx.fillStyle = checker ? '#102030' : '#0d1a28';
+          ctx.fillRect(s.x, s.y, TILE, TILE);
+          ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+          ctx.strokeRect(s.x, s.y, TILE, TILE);
         }
       }
-    }
 
-    function drawBackground() {
-      // 간단한 DJMAX 느낌 배경
-      const g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0, '#020617');
-      g.addColorStop(0.4, '#020617');
-      g.addColorStop(1, '#020617');
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,W,H);
-
-      // 중앙 라인
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(W/2, 0);
-      ctx.lineTo(W/2, H);
-      ctx.stroke();
-    }
-
-    function drawLanes() {
-      for (let i = 0; i < 4; i++) {
-        const x = state.laneX[i];
-        ctx.fillStyle = 'rgba(15,23,42,0.9)';
-        ctx.fillRect(x - state.laneWidth/2, 60, state.laneWidth, H - 120);
-
-        // 라인 테두리
-        ctx.strokeStyle = '#1f2937';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x - state.laneWidth/2, 60, state.laneWidth, H - 120);
+      for (const o of obstacles) {
+        const s = worldToScreen(o.x, o.y);
+        drawRoundedRect(s.x, s.y, o.w, o.h, 16, '#111827', 'rgba(56,189,248,0.12)');
+        ctx.fillStyle = 'rgba(0,255,153,0.035)';
+        ctx.fillRect(s.x + 8, s.y + 8, o.w - 16, o.h - 16);
       }
 
-      // 판정선
-      ctx.fillStyle = '#00ff99';
-      ctx.fillRect(60, state.judgeY, W-120, 3);
+      drawMaster();
+      drawShards();
+      drawEnemies();
+      drawPlayer();
+      drawAttackArc();
+      ctx.restore();
     }
 
-    function drawNotes() {
-      const now = state.time;
+    function drawPlayer() {
+      const p = state.player;
+      const s = worldToScreen(p.x, p.y);
+      const bob = Math.sin(p.step * 2) * 1.6;
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-      for (const n of state.notes) {
-        if (n.hit || (now - n.time) > 0.5) continue; // 너무 지난 노트는 안 그려도 됨
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(s.x - 10, s.y - 6 + bob, 8, 16);
+      ctx.fillRect(s.x + 2, s.y - 6 - bob, 8, 16);
 
-        const t = (now - (n.time - state.appearTime)) / state.appearTime;
-        const y = 60 + t * (state.judgeY - 60);
-        const x = state.laneX[n.lane];
+      ctx.fillStyle = '#0ea5e9';
+      ctx.fillRect(s.x - 13, s.y - 26, 26, 22);
+      ctx.fillStyle = '#fcd34d';
+      ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(s.x - 11, s.y - 46, 22, 8);
+      ctx.fillRect(s.x - 13, s.y - 44, 3, 12);
+      ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(s.x - 6, s.y - 37, 4, 4);
+      ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
 
-        if (y < 60 || y > H) continue;
+      if (p.invincible > 0 && Math.floor(p.invincible * 10) % 2 === 0) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(s.x - 16, s.y - 50, 32, 62);
+      }
+    }
 
-        // 노트
+    function drawEnemyUnit(e) {
+      const s = worldToScreen(e.x, e.y);
+      const conf = enemyConf[e.type];
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 14, 18, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      if (e.hit > 0) ctx.translate((Math.random() - .5) * 3, 0);
+
+      ctx.fillStyle = conf.color;
+      ctx.beginPath();
+      ctx.arc(0, -10, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0b1020';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(conf.emoji, 0, -10);
+
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      drawRoundedRect(-28, -50, 56, 18, 8, 'rgba(0,0,0,0.5)');
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px Satoshi, sans-serif';
+      ctx.fillText(conf.name, 0, -38);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(-22, 18, 44, 6);
+      ctx.fillStyle = conf.color;
+      ctx.fillRect(-22, 18, 44 * (e.hp / e.maxHp), 6);
+      ctx.restore();
+    }
+
+    function drawEnemies() {
+      for (const e of state.enemies) if (e.alive) drawEnemyUnit(e);
+    }
+
+    function drawShards() {
+      for (const srd of state.shards) {
+        if (srd.got) continue;
+        const s = worldToScreen(srd.x, srd.y);
+        const pulse = 1 + Math.sin(Date.now() / 220) * 0.08;
         ctx.save();
-        ctx.translate(x, y);
-        const w = state.laneWidth - 14;
-        const h = 18;
-
-        const colors = ['#38bdf8','#a855f7','#f97316','#22c55e'];
-        ctx.fillStyle = colors[n.lane];
+        ctx.translate(s.x, s.y);
+        ctx.fillStyle = 'rgba(0,255,153,0.14)';
         ctx.beginPath();
-        ctx.roundRect(-w/2, -h/2, w, h, 6);
+        ctx.arc(0, 0, 24 * pulse, 0, Math.PI * 2);
         ctx.fill();
-
-        // 안쪽 하이라이트
-        ctx.globalAlpha = 0.35;
-        ctx.fillStyle = '#f9fafb';
-        ctx.fillRect(-w/2+3, -h/2+3, w-6, 4);
-        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#00ff99';
+        ctx.beginPath();
+        ctx.moveTo(0, -16);
+        ctx.lineTo(10, 0);
+        ctx.lineTo(0, 16);
+        ctx.lineTo(-10, 0);
+        ctx.closePath();
+        ctx.fill();
         ctx.restore();
       }
     }
 
-    function drawJudgeEffect() {
-      if (!state.judgeText) return;
-      ctx.save();
+    function drawMaster() {
+      const m = state.master;
+      const s = worldToScreen(m.x, m.y);
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y + 18, 18, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(s.x - 13, s.y - 26, 26, 24);
+      ctx.fillStyle = '#fcd34d';
+      ctx.fillRect(s.x - 10, s.y - 44, 20, 18);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(s.x - 11, s.y - 46, 22, 8);
+      ctx.fillRect(s.x - 13, s.y - 44, 3, 12);
+      ctx.fillRect(s.x + 10, s.y - 44, 3, 10);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(s.x - 6, s.y - 37, 4, 4);
+      ctx.fillRect(s.x + 2, s.y - 37, 4, 4);
+      drawRoundedRect(s.x - 28, s.y - 68, 56, 18, 8, 'rgba(0,0,0,0.56)');
+      ctx.fillStyle = '#00ff99';
+      ctx.font = 'bold 11px Satoshi, sans-serif';
       ctx.textAlign = 'center';
-      ctx.font = 'bold 32px Satoshi, sans-serif';
-      let col = '#e5e7eb';
-      if (state.judgeText === 'PERFECT') col = '#22c55e';
-      else if (state.judgeText === 'GREAT') col = '#0ea5e9';
-      else if (state.judgeText === 'GOOD') col = '#eab308';
-      else if (state.judgeText === 'MISS') col = '#ef4444';
+      ctx.fillText('박사님', s.x, s.y - 55);
+    }
 
-      ctx.fillStyle = col;
-      ctx.fillText(state.judgeText, W/2, state.judgeY - 70);
+    function drawAttackArc() {
+      const p = state.player;
+      if (p.attackFlash <= 0) return;
+      const s = worldToScreen(p.x, p.y);
+      const alpha = p.attackFlash;
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.9;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      if (p.dir === 'up') ctx.arc(s.x, s.y - 8, 34, Math.PI * 1.15, Math.PI * 1.85);
+      if (p.dir === 'down') ctx.arc(s.x, s.y + 12, 34, Math.PI * 0.15, Math.PI * 0.85);
+      if (p.dir === 'left') ctx.arc(s.x - 10, s.y, 34, Math.PI * 0.65, Math.PI * 1.35);
+      if (p.dir === 'right') ctx.arc(s.x + 10, s.y, 34, Math.PI * 1.65, Math.PI * 0.35);
+      ctx.stroke();
       ctx.restore();
     }
 
-    function render() {
-      ctx.clearRect(0,0,W,H);
-      if (state.phase !== 'play' && state.phase !== 'end') return;
-
-      drawBackground();
-      drawLanes();
-      drawNotes();
-      drawJudgeEffect();
+    function updateCamera() {
+      state.cam.x = clamp(state.player.x - W / 2, 0, WORLD_W - W);
+      state.cam.y = clamp(state.player.y - H / 2, 0, WORLD_H - H);
     }
 
-    function addAccuracySample(diff, baseWindow) {
-      // diff: 실제 오차(초), baseWindow: GOOD 범위
-      const ratio = Math.max(0, 1 - diff / baseWindow);
-      const acc = 50 + ratio * 50; // 50~100 사이 값
-      state.accuracySamples.push(acc);
-    }
+    function interact() {
+      const p = state.player;
 
-    function setJudge(text) {
-      state.judgeText = text;
-      state.judgeTimer = 0.4;
-    }
+      for (const shard of state.shards) {
+        if (!shard.got && dist(p, shard) < INTERACT_RANGE) {
+          shard.got = true;
+          p.core += 1;
+          p.gold += 12;
+          setDialog('본질 조각', shard.text);
+          updateHud();
+          return;
+        }
+      }
 
-    function registerHit(note, judge, scoreAdd, diff, goodWindow) {
-      note.hit = true;
-      note.judged = true;
-      state.combo += 1;
-      if (state.combo > state.maxCombo) state.maxCombo = state.combo;
-      state.score += scoreAdd + state.combo * 1.5;
-      addAccuracySample(diff, goodWindow);
-      setJudge(judge);
-      updateScoreUI();
-
-      // 판정별 안내 문구 (살짝 교육 텍스트 섞기)
-      if (judge === 'PERFECT') {
-        setDialog('만체리 - 본질',
-          '완벽한 타이밍입니다. 지금처럼 “실제 수요가 온 시점”을 잡는 게 핵심입니다.');
-      } else if (judge === 'GREAT') {
-        setDialog('사업화·고수익화',
-          '좋은 타이밍입니다. 구조를 조금 더 다듬으면 더 큰 레버리지를 만들 수 있습니다.');
-      } else if (judge === 'GOOD') {
-        setDialog('기술',
-          '기술은 맞았지만, 타이밍이 약간 어긋났습니다. 본질(만체리) 타이밍까지 의식해 보세요.');
+      if (dist(p, state.master) < INTERACT_RANGE) {
+        const allGot = state.shards.every(s => s.got);
+        if (!allGot) {
+          setDialog('박사님', '조각이 아직 부족하네. 필드를 돌며 본질 조각 4개를 모두 회수하게.');
+        } else {
+          setDialog('박사님', '좋네. 기술, 만체리, 사업화, 코어가 하나로 정렬됐네. 이제 결과를 보게.');
+          showResult();
+        }
       }
     }
 
-    function registerMiss() {
-      state.combo = 0;
-      setJudge('MISS');
-      state.accuracySamples.push(50);
-      updateScoreUI();
-      setDialog('코어(Core)',
-        '놓친 비트입니다. 내가 좋아하며 꾸준히 들고 갈 수 있는 코어인지 다시 점검해 보세요.');
+    function attack() {
+      const p = state.player;
+      if (p.attackCooldown > 0) return;
+      p.attackCooldown = 0.38;
+      p.attackFlash = 0.32;
+      let hit = false;
+
+      for (const e of state.enemies) {
+        if (!e.alive) continue;
+        const dx = e.x - p.x;
+        const dy = e.y - p.y;
+        const near = Math.hypot(dx, dy) < ATTACK_RANGE;
+        const facing =
+          (p.dir === 'up' && dy < 0 && Math.abs(dx) < 54) ||
+          (p.dir === 'down' && dy > 0 && Math.abs(dx) < 54) ||
+          (p.dir === 'left' && dx < 0 && Math.abs(dy) < 54) ||
+          (p.dir === 'right' && dx > 0 && Math.abs(dy) < 54);
+
+        if (near && facing) {
+          hit = true;
+          e.hp -= 16;
+          e.hit = 0.22;
+          state.shake = 1;
+          if (e.hp <= 0) {
+            e.alive = false;
+            state.player.gold += 18;
+            state.kills += 1;
+            setDialog('시스템', `${enemyConf[e.type].name}을(를) 돌파했습니다. Gold +18`);
+          } else {
+            setDialog('적 분석', enemyConf[e.type].line);
+          }
+        }
+      }
+
+      if (!hit) interact();
+      updateHud();
     }
 
-    function judgeLane(lane) {
-      if (state.phase !== 'play') return;
-
-      const now = state.time;
-      const hitWindow = {
-        perfect: 0.06,
-        great: 0.12,
-        good: 0.2
-      };
-
-      // 아직 판정 안 된, 해당 레인의 노트들 중에서 가장 가까운 것
-      const candidates = state.notes
-        .filter(n => !n.judged && n.lane === lane)
-        .sort((a,b) => Math.abs(a.time - now) - Math.abs(b.time - now));
-
-      if (!candidates.length) {
-        registerMiss();
-        return;
+    function enemyLogic(dt) {
+      const p = state.player;
+      for (const e of state.enemies) {
+        if (!e.alive) continue;
+        if (e.hit > 0) e.hit -= dt;
+        const d = dist(p, e);
+        if (d < 180) {
+          const vx = (p.x - e.x) / d;
+          const vy = (p.y - e.y) / d;
+          const nx = e.x + vx * e.speed * dt;
+          const ny = e.y + vy * e.speed * dt;
+          const box = { x: nx - 16, y: ny - 12, w: 32, h: 24 };
+          let blocked = false;
+          for (const o of obstacles) if (rectsOverlap(box, o)) blocked = true;
+          if (!blocked) { e.x = nx; e.y = ny; }
+        }
+        if (d < 34 && p.invincible <= 0) {
+          p.hp -= 10;
+          p.invincible = 1;
+          state.shake = 1.4;
+          setDialog('적 습격', `${enemyConf[e.type].name}에게 피해를 입었습니다. HP -10`);
+          if (p.hp <= 0) {
+            p.hp = 0;
+            showResult(true);
+          }
+          updateHud();
+        }
       }
+    }
 
-      const note = candidates[0];
-      const diff = Math.abs(note.time - now);
+    function movePlayer(dt) {
+      const p = state.player;
+      let mx = 0, my = 0;
+      if (Input.keys['ArrowLeft']) { mx -= 1; p.dir = 'left'; }
+      if (Input.keys['ArrowRight']) { mx += 1; p.dir = 'right'; }
+      if (Input.keys['ArrowUp']) { my -= 1; p.dir = 'up'; }
+      if (Input.keys['ArrowDown']) { my += 1; p.dir = 'down'; }
 
-      if (diff <= hitWindow.perfect) {
-        registerHit(note, 'PERFECT', 300, diff, hitWindow.good);
-      } else if (diff <= hitWindow.great) {
-        registerHit(note, 'GREAT', 200, diff, hitWindow.good);
-      } else if (diff <= hitWindow.good) {
-        registerHit(note, 'GOOD', 100, diff, hitWindow.good);
-      } else {
-        note.judged = true;
-        registerMiss();
+      if (mx !== 0 || my !== 0) {
+        const len = Math.hypot(mx, my) || 1;
+        mx /= len; my /= len;
+        const nx = p.x + mx * p.speed * dt;
+        const ny = p.y + my * p.speed * dt;
+        if (canMoveTo(nx, p.y)) p.x = nx;
+        if (canMoveTo(p.x, ny)) p.y = ny;
+        p.stepTimer += dt;
+        if (p.stepTimer > 0.12) {
+          p.step += 1;
+          p.stepTimer = 0;
+        }
       }
+    }
+
+    function showResult(fail = false) {
+      if (state.resultShown) return;
+      state.resultShown = true;
+      state.phase = 'end';
+      const text = fail
+        ? `전투 중 체력이 모두 소진되었습니다. 그래도 본질 조각 ${state.player.core}개와 적 처치 ${state.kills}회 기록은 남았습니다. 숫자만 좇지 말고, 되는 구조부터 다시 설계해보세요.`
+        : `본질 조각 ${state.player.core}개를 모두 모으고 적 ${state.kills}체를 돌파했습니다. 기술, 만체리, 사업화, 코어가 연결되며 구조가 완성되었습니다. 최종 Gold는 ${state.player.gold}입니다.`;
+      document.getElementById('result-text').textContent = text;
+      document.getElementById('result-screen').style.display = 'flex';
     }
 
     function update(dt) {
       if (state.phase !== 'play') return;
+      const p = state.player;
+      if (p.attackCooldown > 0) p.attackCooldown -= dt;
+      if (p.attackFlash > 0) p.attackFlash -= dt;
+      if (p.invincible > 0) p.invincible -= dt;
+      if (state.messageTimer > 0) state.messageTimer -= dt;
 
-      state.time += dt;
-      spawnNotesIfNeeded();
+      movePlayer(dt);
+      enemyLogic(dt);
 
-      // MISS 판정 (노트가 판정선 지나고도 안 눌린 경우)
-      const missWindow = 0.18;
-      for (const n of state.notes) {
-        if (n.judged) continue;
-        if (state.time - n.time > missWindow) {
-          n.judged = true;
-          state.combo = 0;
-          setJudge('MISS');
-          state.accuracySamples.push(50);
-          updateScoreUI();
-        }
-      }
-
-      if (state.judgeTimer > 0) {
-        state.judgeTimer -= dt;
-        if (state.judgeTimer <= 0) {
-          state.judgeText = '';
-        }
-      }
-
-      if (state.time >= state.songLength && state.phase === 'play') {
-        endGame();
-      }
+      if (Input.justPressed['KeyZ'] || Input.justPressed['Space']) attack();
+      Input.justPressed = {};
+      updateCamera();
     }
 
-    function endGame() {
-      state.phase = 'end';
-      const acc =
-        state.accuracySamples.length
-          ? (state.accuracySamples.reduce((a,b)=>a+b,0) / state.accuracySamples.length)
-          : 100;
-
-      const el = document.createElement('div');
-      el.style.cssText =
-        'position:absolute;inset:0;z-index:20;background:rgba(5,10,15,0.97);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;';
-      el.innerHTML = `
-        <div style="font-size:48px;">⭐</div>
-        <h1 style="font-size:24px;font-weight:700;color:#00ff99;text-align:center;">본질센스 리듬 액션 클리어</h1>
-        <p style="color:#94a3b8;font-size:13px;line-height:1.8;text-align:center;max-width:440px;padding:0 16px;">
-          최종 스코어:
-          <strong style="color:#00ff99;font-size:18px;">
-            ${Math.floor(state.score).toLocaleString()}
-          </strong><br>
-          최대 콤보: <strong>${state.maxCombo}</strong> / 평균 정확도:
-          <strong>${acc.toFixed(1)}%</strong><br><br>
-          기술 위에 본질(만체리: 잠재 트래픽·노출 가능성·가격×수),<br>
-          사업화·고수익화(다회성 트래픽·브랜딩·CPA·레버리지)를 쌓고,<br>
-          코어까지 정렬한 결과입니다.
-        </p>
-        <button onclick="location.reload()"
-          style="background:#00ff99;color:#07110d;border:none;border-radius:8px;padding:10px 28px;font-size:15px;font-weight:700;cursor:pointer;">
-          다시 플레이
-        </button>
-      `;
-      document.getElementById('wrap').appendChild(el);
-    }
-
-    // 키 입력 (D/F/J/K)
-    const keyLaneMap = {
-      'KeyD': 0,
-      'KeyF': 1,
-      'KeyJ': 2,
-      'KeyK': 3
-    };
-
-    document.addEventListener('keydown', e => {
-      if (e.repeat) return;
-      if (keyLaneMap.hasOwnProperty(e.code)) {
-        e.preventDefault();
-        judgeLane(keyLaneMap[e.code]);
-      }
-    });
-
-    // 터치 / 마우스로 레인 버튼 누르기
-    function bindLaneButton(el) {
-      const lane = Number(el.dataset.lane);
-      const handler = e => {
-        e.preventDefault();
-        judgeLane(lane);
-      };
-      el.addEventListener('touchstart', handler, { passive: false });
-      el.addEventListener('mousedown', handler);
-    }
-    document.querySelectorAll('.lane-btn').forEach(bindLaneButton);
-
-    let lastTime = 0;
     function loop(now) {
       const dt = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
       update(dt);
-      render();
+      drawWorld();
       requestAnimationFrame(loop);
     }
 
+    let lastTime = 0;
     document.getElementById('start-btn').addEventListener('click', () => {
       document.getElementById('start-screen').style.display = 'none';
       state.phase = 'play';
-      setDialog('박사님',
-        'D / F / J / K 네 키가 각각 기술, 만체리, 사업화·고수익화, 코어다. 비트에 맞춰 입력하며 구조를 몸으로 익혀보게.');
-      updateScoreUI();
+      updateHud();
+      updateCamera();
+      setDialog('박사님', '이제 직접 움직여 보게. 방향키로 탐험하고, Z 키로 상호작용과 공격을 하게.');
       lastTime = performance.now();
       requestAnimationFrame(loop);
     });
+
+    updateHud();
+    drawWorld();
   </script>
 </body>
 </html>
