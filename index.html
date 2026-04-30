@@ -19,22 +19,29 @@
       display: flex; justify-content: center; align-items: center; flex-direction: column;
       padding: 10px; gap: 10px;
     }
+    #game-shell {
+      width: min(1320px, 100vw);
+      display: grid;
+      grid-template-columns: minmax(220px, 250px) minmax(0, 860px) minmax(220px, 270px);
+      gap: 12px;
+      align-items: start;
+    }
     #wrap {
-      position: relative; width: min(860px, 100vw); height: min(860px, calc(100vw + 10px));
-      max-height: calc(100dvh - 150px); background: #000; border-radius: 24px; overflow: hidden;
+      position: relative; width: 100%; aspect-ratio: 1 / 1;
+      max-height: calc(100dvh - 220px); background: #000; border-radius: 24px; overflow: hidden;
       border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 30px 80px rgba(0,0,0,0.48); flex-shrink: 0;
     }
     canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-    #ui { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+    #ui { display: contents; }
     .glass {
       background: rgba(7,10,15,0.72); border: 1px solid rgba(148,163,184,0.12);
       backdrop-filter: blur(10px); box-shadow: 0 14px 34px rgba(0,0,0,0.24);
     }
     .top-hud {
-      position: absolute; inset: 12px 12px auto 12px; display: flex; justify-content: space-between;
-      align-items: flex-start; gap: 10px;
+      width: min(1320px, 100vw);
+      display: flex; justify-content: center; align-items: stretch; gap: 12px;
     }
-    .brand-box { padding: 12px 14px; border-radius: 18px; width: min(370px, 58vw); }
+    .brand-box { padding: 12px 14px; border-radius: 18px; flex: 1; min-width: 0; }
     .brand-chip {
       display: inline-flex; padding: 6px 10px; border-radius: 999px; color: #00ff99;
       background: rgba(0,255,153,0.08); border: 1px solid rgba(0,255,153,0.18);
@@ -42,23 +49,23 @@
     }
     .brand-title { font-size: clamp(20px, 3vw, 28px); font-weight: 900; line-height: 1.06; margin-bottom: 6px; letter-spacing: -0.03em; }
     .brand-sub { font-size: 12px; color: #94a3b8; line-height: 1.55; }
-    .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; width: min(640px, 48vw); }
     .stat-box { min-width: 98px; padding: 10px 12px; border-radius: 16px; }
     .stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
     .stat-value { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
 
     #left-box, #quest-box, #dialog-box {
-      position: absolute; border-radius: 18px; padding: 12px 14px;
+      position: static; border-radius: 18px; padding: 12px 14px;
     }
-    #left-box { left: 12px; top: 112px; width: min(250px, 42vw); }
-    #quest-box { right: 12px; top: 112px; width: min(270px, 44vw); }
+    #left-box { width: 100%; }
+    #quest-box { width: 100%; }
     .hud-title { color: #00ff99; font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: .05em; }
     .hud-text { color: #dbe4ee; font-size: 12px; line-height: 1.65; }
     .small-list { display: grid; gap: 6px; }
     .small-line { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #e6edf6; }
     .small-line span:last-child { color: #94a3b8; }
 
-    #dialog-box { left: 12px; right: 12px; bottom: 12px; }
+    #dialog-box { width: min(1320px, 100vw); }
     #dialog-speaker { font-size: 12px; font-weight: 800; margin-bottom: 5px; color: #00ff99; text-transform: uppercase; letter-spacing: .05em; }
     #dialog-text { font-size: 14px; line-height: 1.7; color: #f8fafc; }
 
@@ -85,7 +92,7 @@
     }
 
     #touch-controls {
-      width: min(860px, 100vw); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 6px; flex-shrink: 0;
+      width: min(1320px, 100vw); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 6px; flex-shrink: 0;
     }
     #dpad { position: relative; width: 156px; height: 156px; flex-shrink: 0; }
     .dpad-btn {
@@ -106,60 +113,53 @@
     }
     .dpad-btn:active, .action-btn:active { transform: translateY(1px) scale(.98); }
 
-    @media (max-width: 760px) {
-      #wrap { border-radius: 18px; max-height: calc(100dvh - 210px); }
-      .top-hud { flex-direction: column; }
-      .brand-box { width: 100%; }
+    @media (max-width: 1100px) {
+      #game-shell { grid-template-columns: 1fr; }
+      #wrap { max-height: calc(100dvh - 360px); }
+      .top-hud { flex-direction: column; width: 100%; }
+      .brand-box, .stats, #dialog-box, #touch-controls { width: 100%; }
       .stats { justify-content: flex-start; }
-      #left-box { width: min(220px, 48vw); }
-      #quest-box { right: 12px; top: auto; bottom: 116px; width: min(220px, 48vw); }
-      .features { grid-template-columns: 1fr; }
       #dialog-text { font-size: 13px; }
+    }
+    @media (max-width: 760px) {
+      #wrap { border-radius: 18px; max-height: calc(100dvh - 420px); }
+      .features { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div id="wrap">
-    <canvas id="c" width="860" height="860"></canvas>
+  <div class="top-hud">
+    <div class="brand-box glass">
+      <div class="brand-chip">◆ BONJIL SENSE EXPANDED</div>
+      <div class="brand-title">상호작용 확장판 액션 RPG</div>
+      <div class="brand-sub">상자, 표지판, 샘, 상인, 점프패드, 문서, 조각, NPC 대화까지 늘리고, 박사님 상호작용 오류도 고쳤습니다.</div>
+    </div>
+    <div class="stats">
+      <div class="stat-box glass"><div class="stat-label">HP</div><div class="stat-value" id="hp-ui">120 / 120</div></div>
+      <div class="stat-box glass"><div class="stat-label">Gold</div><div class="stat-value" id="gold-ui">0</div></div>
+      <div class="stat-box glass"><div class="stat-label">Core</div><div class="stat-value" id="core-ui">0 / 6</div></div>
+      <div class="stat-box glass"><div class="stat-label">Combo</div><div class="stat-value" id="combo-ui">0x</div></div>
+    </div>
+  </div>
 
-    <div id="ui">
-      <div class="top-hud">
-        <div class="brand-box glass">
-          <div class="brand-chip">◆ BONJIL SENSE EXPANDED</div>
-          <div class="brand-title">상호작용 확장판 액션 RPG</div>
-          <div class="brand-sub">상자, 표지판, 샘, 상인, 점프패드, 문서, 조각, NPC 대화까지 늘리고, 박사님 상호작용 오류도 고쳤습니다.</div>
-        </div>
-        <div class="stats">
-          <div class="stat-box glass"><div class="stat-label">HP</div><div class="stat-value" id="hp-ui">120 / 120</div></div>
-          <div class="stat-box glass"><div class="stat-label">Gold</div><div class="stat-value" id="gold-ui">0</div></div>
-          <div class="stat-box glass"><div class="stat-label">Core</div><div class="stat-value" id="core-ui">0 / 6</div></div>
-          <div class="stat-box glass"><div class="stat-label">Combo</div><div class="stat-value" id="combo-ui">0x</div></div>
-        </div>
-      </div>
-
-      <div id="left-box" class="glass">
-        <div class="hud-title">조작 / 오브젝트</div>
-        <div class="small-list">
-          <div class="small-line"><span>이동</span><span>방향키</span></div>
-          <div class="small-line"><span>공격 / 상호작용</span><span>Z</span></div>
-          <div class="small-line"><span>대시</span><span>X</span></div>
-          <div class="small-line"><span>열 수 있는 상자</span><span>📦</span></div>
-          <div class="small-line"><span>회복의 샘</span><span>💧</span></div>
-          <div class="small-line"><span>표지판 / 문서</span><span>🪧 📜</span></div>
-          <div class="small-line"><span>점프 패드</span><span>🌀</span></div>
-        </div>
-      </div>
-
-      <div id="quest-box" class="glass">
-        <div class="hud-title">현재 목표</div>
-        <div class="hud-text" id="quest-text">필드의 본질 조각을 모으고, 각종 상호작용 오브젝트를 활용해 박사님에게 돌아가세요.</div>
-      </div>
-
-      <div id="dialog-box" class="glass">
-        <div id="dialog-speaker">시스템 알림</div>
-        <div id="dialog-text">박사님 근처에서 Z를 누르면 대화됩니다. 이번 버전은 NPC 우선 상호작용 범위를 넓혀 고쳤습니다.</div>
+  <div id="game-shell">
+    <div id="left-box" class="glass">
+      <div class="hud-title">조작 / 오브젝트</div>
+      <div class="small-list">
+        <div class="small-line"><span>이동</span><span>방향키</span></div>
+        <div class="small-line"><span>공격 / 상호작용</span><span>Z</span></div>
+        <div class="small-line"><span>대시</span><span>X</span></div>
+        <div class="small-line"><span>열 수 있는 상자</span><span>📦</span></div>
+        <div class="small-line"><span>회복의 샘</span><span>💧</span></div>
+        <div class="small-line"><span>표지판 / 문서</span><span>🪧 📜</span></div>
+        <div class="small-line"><span>점프 패드</span><span>🌀</span></div>
       </div>
     </div>
+
+    <div id="wrap">
+      <canvas id="c" width="860" height="860"></canvas>
+
+      <div id="ui">
 
     <div id="start-screen">
       <div class="overlay-card">
@@ -187,6 +187,17 @@
         <button class="start-btn" onclick="location.reload()">다시 플레이</button>
       </div>
     </div>
+  </div>
+
+    <div id="quest-box" class="glass">
+      <div class="hud-title">현재 목표</div>
+      <div class="hud-text" id="quest-text">필드의 본질 조각을 모으고, 각종 상호작용 오브젝트를 활용해 박사님에게 돌아가세요.</div>
+    </div>
+  </div>
+
+  <div id="dialog-box" class="glass">
+    <div id="dialog-speaker">시스템 알림</div>
+    <div id="dialog-text">박사님 근처에서 Z를 누르면 대화됩니다. 이번 버전은 NPC 우선 상호작용 범위를 넓혀 고쳤습니다.</div>
   </div>
 
   <div id="touch-controls">
